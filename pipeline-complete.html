@@ -9,8 +9,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--navy:#1a2907;--orange:#1a716e;--light:#faefce;--white:#fff;--gray:#6c757d;--red:#dc3545;--green:#1a716e;--blue:#1a716e;--yellow:#d4a843;--dark:#1a2907;--teal:#1a716e;--purple:#1a716e;--cream:#faefce}
-body{font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:#1a2907;line-height:1.6;display:flex;min-height:100vh}
+:root{--navy:#1a2907;--orange:#1a716e;--light:#f9fafb;--white:#fff;--gray:#6b7280;--red:#dc3545;--green:#1a716e;--blue:#1a716e;--yellow:#d4a843;--dark:#1a2907;--teal:#1a716e;--purple:#1a716e;--cream:#faefce}
+body{font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif;background:#fff;color:#1a2907;line-height:1.6;display:flex;min-height:100vh}
 .sidebar{width:260px;background:var(--navy);color:var(--white);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;padding:20px 0;transition:transform .3s}
 .sidebar .logo{padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:10px;font-size:1.2em;font-weight:700}
 .sidebar .logo span{color:var(--orange)}
@@ -25,21 +25,21 @@ header h1{font-family:'Outfit',sans-serif;font-size:2.2em;letter-spacing:-1px}he
 header p{opacity:.8;margin-top:8px;font-size:1.05em}
 .badge{display:inline-block;background:var(--orange);color:var(--white);padding:3px 14px;border-radius:20px;font-size:.8em;margin-top:10px;font-weight:600}
 .content{max-width:1000px;margin:0 auto;padding:0 30px}
-section{padding:40px 0;border-bottom:1px solid #e9ecef}section:last-child{border:0}
+section{padding:40px 0;border-bottom:1px solid #e8e8e8}section:last-child{border:0}
 h2{font-family:'Outfit',sans-serif;color:var(--navy);font-size:1.8em;margin-bottom:20px;padding-top:10px}
 h2 .num{color:var(--orange);font-size:.7em;margin-right:6px}
 h3{font-family:'Outfit',sans-serif;color:var(--navy);margin:20px 0 10px;font-size:1.2em}
-.card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;border-left:4px solid var(--orange)}
+.card{background:var(--white);border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e8e8e8;margin-bottom:16px;border-left:4px solid var(--orange)}
 .card.red{border-left-color:var(--red)}.card.green{border-left-color:var(--green)}.card.blue{border-left-color:var(--blue)}.card.yellow{border-left-color:var(--yellow)}.card.navy{border-left-color:var(--navy)}.card.purple{border-left-color:var(--purple)}.card.teal{border-left-color:var(--teal)}
 .card h3{margin-top:0}
 .grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.grid-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .stat{text-align:center;padding:20px}.stat .num{font-size:2.2em;font-weight:800;color:var(--navy)}.stat .label{font-size:.85em;color:var(--gray);margin-top:4px}.stat.red .num{color:var(--red)}.stat.green .num{color:var(--green)}.stat.orange .num{color:var(--orange)}
 table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9em}
-th{background:var(--navy);color:var(--white);padding:10px 12px;text-align:left;font-size:.85em}
+th{background:var(--navy);color:var(--white);padding:10px 12px;text-align:left;font-size:.85em;font-family:'Outfit',sans-serif;font-weight:600}
 td{padding:10px 12px;border-bottom:1px solid #e9ecef}
 tr:hover{background:rgba(255,107,53,.03)}
 .copy{cursor:pointer;background:#f0f0f0;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:.85em}.copy:hover{background:var(--orange);color:var(--white)}
-.stage-card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px;border-top:4px solid var(--orange)}
+.stage-card{background:var(--white);border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e8e8e8;margin-bottom:20px;border-top:4px solid var(--orange)}
 .stage-card .stage-name{font-size:1.3em;font-weight:700;color:var(--navy)}
 .stage-card .stage-badge{font-size:.75em;padding:4px 12px;border-radius:12px;font-weight:600;display:inline-block;margin-left:8px}
 .zone-sdr{background:#e3f2fd;color:#1565c0}.zone-pipe{background:#e8f5e9;color:#2e7d32}.zone-exit{background:#fce4ec;color:#c62828}
