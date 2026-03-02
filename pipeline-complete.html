@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--navy:#1a2907;--orange:#1a716e;--light:#f9fafb;--white:#fff;--gray:#6b7280;--red:#dc3545;--green:#1a716e;--blue:#1a716e;--yellow:#d4a843;--dark:#1a2907;--teal:#1a716e;--purple:#1a716e;--cream:#faefce}
+:root{--navy:#021110;--orange:#eea54e;--light:#f9fafb;--white:#fff;--gray:#6b7280;--red:#dc3545;--green:#1a716e;--blue:#96b7e1;--yellow:#eea54e;--dark:#021110;--teal:#1a716e;--purple:#3d0b90;--cream:#faefce;--green-oil:#1a716e;--black:#021110;--pink:#f7d9d9;--water-green:#cdf8e9;--light-green:#e0fbab;--purple-pastel:#d5cbe7;--blue-pastel:#96b7e1}
 body{font-family:'Figtree','Segoe UI',system-ui,sans-serif;background:#fff;color:#1a2907;line-height:1.7;display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
 
 /* Sidebar */
@@ -84,10 +84,10 @@ tr:hover td{background:#f9fafb}
 
 /* Alerts */
 .alert{padding:18px 22px;border-radius:12px;margin:16px 0;font-size:.9em;line-height:1.6}
-.alert.info{background:#eff6ff;border-left:4px solid #3b82f6;color:#1e40af}
-.alert.warn{background:#fffbeb;border-left:4px solid #f59e0b;color:#92400e}
-.alert.danger{background:#fef2f2;border-left:4px solid var(--red);color:#991b1b}
-.alert.success{background:#f0fdf4;border-left:4px solid #22c55e;color:#166534}
+.alert.info{background:var(--blue-pastel);background:rgba(150,183,225,.2);border-left:4px solid var(--blue-pastel);color:var(--black)}
+.alert.warn{background:rgba(238,165,78,.12);border-left:4px solid var(--orange);color:#7c4a0a}
+.alert.danger{background:var(--pink);border-left:4px solid var(--red);color:#991b1b}
+.alert.success{background:var(--water-green);border-left:4px solid var(--green-oil);color:#0a4a3a}
 
 /* Misc */
 .workflow{background:var(--white);border-radius:12px;padding:16px;margin:12px 0;border:1px solid #ebebeb}
@@ -108,7 +108,7 @@ section{animation:fadeUp .4s ease both}
 <body>
 <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
 <aside class="sidebar">
-  <div class="logo">♿ <span>WTW</span> Pipeline</div>
+  <div class="logo"><img src="logo.jpg" alt="WTW" style="height:28px;border-radius:4px;vertical-align:middle;margin-right:8px;opacity:.9"><span>Pipeline</span></div>
   <div class="group-label">A. Strategy</div>
   <a href="#goals">0. 2026 Revenue Goal</a>
   <a href="#current-state">1. Current State</a>
@@ -138,7 +138,7 @@ section{animation:fadeUp .4s ease both}
 
 <div class="main">
 <header>
-  <div style="font-size:.75em;text-transform:uppercase;letter-spacing:3px;color:rgba(250,239,206,.4);margin-bottom:8px;font-weight:600">Wheel the World</div>
+  <img src="logo.jpg" alt="WTW Accessibility Verified" style="height:60px;margin-bottom:16px;border-radius:8px;opacity:.9">
   <h1>Pipeline & <span>CRM System</span></h1>
   <p>Gap Selling · Lifecycle · Implementation · Metrics</p>
   <span class="badge">v3 · March 2026</span>
