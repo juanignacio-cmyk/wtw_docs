@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WTW Pipeline Master — The Definitive Guide</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1a1a2e;--orange:#FF6B35;--light:#f8f9fa;--white:#fff;--gray:#6c757d;--red:#dc3545;--green:#28a745;--blue:#0d6efd;--yellow:#ffc107;--dark:#343a40}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--light);color:#333;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header{background:var(--navy);color:var(--white);padding:40px 0;text-align:center}
+header h1{font-size:2.4em;letter-spacing:-1px}
+header h1 span{color:var(--orange)}
+header p{opacity:.8;margin-top:8px;font-size:1.1em}
+.subtitle{display:inline-block;background:var(--orange);color:var(--white);padding:4px 16px;border-radius:20px;font-size:.85em;margin-top:12px;font-weight:600}
+
+/* Navigation */
+nav{background:var(--white);border-bottom:2px solid var(--orange);padding:12px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+nav .container{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+nav a{text-decoration:none;color:var(--navy);font-weight:600;font-size:.82em;padding:6px 14px;border-radius:6px;transition:.2s;white-space:nowrap}
+nav a:hover,nav a.active{background:var(--orange);color:var(--white)}
+
+/* Sections */
+section{padding:50px 0}
+.section-header{text-align:center;margin-bottom:40px}
+.section-header h2{color:var(--navy);font-size:2em;margin-bottom:8px}
+.section-header .part-label{display:inline-block;background:var(--orange);color:var(--white);padding:2px 12px;border-radius:12px;font-size:.75em;font-weight:700;margin-bottom:8px;letter-spacing:1px}
+.section-header p{color:var(--gray);font-size:1.05em}
+section:nth-child(even){background:var(--white)}
+
+/* Cards */
+.card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px;border-left:4px solid var(--orange)}
+.card h3{color:var(--navy);margin-bottom:12px;font-size:1.15em}
+.card.red{border-left-color:var(--red)}
+.card.green{border-left-color:var(--green)}
+.card.blue{border-left-color:var(--blue)}
+.card.yellow{border-left-color:var(--yellow)}
+.card.navy{border-left-color:var(--navy)}
+
+/* Problem cards */
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.problem-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);border-top:4px solid var(--red)}
+.problem-card h4{color:var(--red);margin-bottom:10px;font-size:1em}
+.problem-card ul{list-style:none;padding:0}
+.problem-card li{padding:6px 0;font-size:.92em;border-bottom:1px solid #f0f0f0}
+.problem-card li:last-child{border:0}
+.problem-card li::before{content:'✕ ';color:var(--red);font-weight:700}
+
+/* Data stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}
+.stat-card{background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #fecdd3;border-radius:10px;padding:16px;text-align:center}
+.stat-card .num{font-size:2em;font-weight:800;color:var(--red)}
+.stat-card .label{font-size:.78em;color:var(--gray);margin-top:4px}
+
+/* Flow diagram */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:30px 0;padding:20px 0}
+.flow-node{background:var(--navy);color:var(--white);padding:12px 18px;border-radius:10px;text-align:center;font-size:.82em;font-weight:600;min-width:100px;position:relative}
+.flow-node.orange{background:var(--orange)}
+.flow-node.green{background:var(--green)}
+.flow-node.red{background:var(--red)}
+.flow-node.blue{background:var(--blue)}
+.flow-node.gray{background:var(--gray)}
+.flow-node small{display:block;font-weight:400;opacity:.85;font-size:.85em}
+.flow-arrow{color:var(--orange);font-size:1.5em;font-weight:700;padding:0 4px;flex-shrink:0}
+
+/* Pre-pipeline / Pipeline zone */
+.zone{border:2px dashed var(--gray);border-radius:16px;padding:24px;margin:20px 0;position:relative}
+.zone.pre{border-color:var(--blue)}
+.zone.sales{border-color:var(--orange)}
+.zone.gate{border-color:var(--yellow);border-style:solid;background:linear-gradient(135deg,#fffbeb,#fef3c7)}
+.zone-label{position:absolute;top:-14px;left:24px;background:var(--light);padding:0 12px;font-weight:700;font-size:.85em;letter-spacing:1px}
+.zone.pre .zone-label{color:var(--blue)}
+.zone.sales .zone-label{color:var(--orange)}
+.zone.gate .zone-label{color:#b45309;background:#fef3c7}
+section:nth-child(even) .zone-label{background:var(--white)}
+
+/* Stage cards */
+.stage-card{background:var(--white);border-radius:14px;padding:0;box-shadow:0 3px 16px rgba(0,0,0,.07);margin-bottom:28px;overflow:hidden}
+.stage-header{padding:16px 24px;color:var(--white);display:flex;justify-content:space-between;align-items:center}
+.stage-header h3{font-size:1.15em}
+.stage-header .badge{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-size:.75em}
+.stage-body{padding:20px 24px}
+.stage-body .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.meta-item{font-size:.88em}
+.meta-item strong{color:var(--navy);display:block;font-size:.75em;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.stage-body ol,.stage-body ul{padding-left:20px;font-size:.9em}
+.stage-body li{margin-bottom:4px}
+.example-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-top:12px;font-size:.88em}
+.example-box.bad{background:#fef2f2;border-color:#fecdd3}
+.example-box strong{display:block;margin-bottom:4px;font-size:.8em;text-transform:uppercase;letter-spacing:.5px}
+.example-box.bad strong{color:var(--red)}
+.example-box strong{color:var(--green)}
+.props{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.prop{background:#e8eaff;color:var(--navy);padding:3px 10px;border-radius:6px;font-size:.78em;font-weight:600}
+
+/* Playbook spec grid */
+.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.pb-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;font-size:.88em}
+.pb-item .pb-label{font-weight:700;color:var(--navy);font-size:.78em;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pb-item.full{grid-column:1/-1}
+.pb-item ul{margin:4px 0 0;padding-left:18px;font-size:.92em}
+.pb-item li{margin:2px 0}
+
+/* Decision tree */
+.tree{font-family:'Courier New',monospace;background:var(--navy);color:#e2e8f0;border-radius:12px;padding:24px;font-size:.82em;line-height:1.8;overflow-x:auto;margin:16px 0;white-space:pre}
+.tree .yes{color:#4ade80}
+.tree .no{color:#f87171}
+.tree .q{color:var(--orange)}
+.tree .result{color:#38bdf8}
+
+/* Visual Timeline */
+.vtl{display:flex;align-items:stretch;gap:2px;margin:30px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.vtl-block{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;color:#fff;font-weight:700;text-align:center;min-height:80px;position:relative}
+.vtl-block .vtl-stage{font-size:.78em;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;opacity:.9}
+.vtl-block .vtl-days{font-size:1.6em;font-weight:800;line-height:1}
+.vtl-block .vtl-type{font-size:.65em;opacity:.7;margin-top:4px;font-weight:400}
+
+/* Lifecycle mapping */
+.lc-map{background:var(--navy);border-radius:16px;padding:32px 24px;margin:20px 0;color:#fff}
+.lc-map h3{text-align:center;font-size:1.3em;margin-bottom:6px}
+.lc-map .lc-sub{text-align:center;color:#94a3b8;font-size:.88em;margin-bottom:24px}
+.lc-grid{display:grid;grid-template-columns:200px 40px 1fr;gap:0;align-items:start}
+.lc-col h4{font-size:.78em;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:12px}
+.lc-pill{display:block;padding:8px 14px;border-radius:8px;font-size:.82em;font-weight:600;margin:6px 0;text-align:center;width:170px}
+.lc-sync{display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:36px;gap:18px}
+.lc-dot{width:6px;height:6px;background:#475569;border-radius:50%}
+.lc-sync-label{writing-mode:vertical-rl;font-weight:700;letter-spacing:2px;font-size:.72em;color:#64748b;margin-bottom:8px}
+.lc-pipeline{padding-left:16px;border-left:1px solid rgba(255,255,255,.1)}
+.pp-group{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.pp-group-label{font-size:.68em;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#64748b;margin-bottom:8px}
+.pp-pills{display:flex;gap:8px;flex-wrap:wrap}
+.pp-pill{padding:6px 14px;border-radius:6px;font-size:.78em;font-weight:600}
+.lc-rules{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;max-width:800px;margin-left:auto;margin-right:auto}
+.lc-rule{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;font-size:.78em;color:#cbd5e1;display:flex;align-items:center;gap:8px}
+
+/* Metrics */
+.metric-big{text-align:center;padding:30px;background:linear-gradient(135deg,var(--navy),#16213e);color:var(--white);border-radius:14px;margin-bottom:16px}
+.metric-big .value{font-size:3em;font-weight:800;color:var(--orange)}
+.metric-big .desc{opacity:.8;margin-top:4px;font-size:.95em}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+.metric-card{background:var(--white);border-radius:12px;padding:20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.metric-card .icon{font-size:2em;margin-bottom:8px}
+.metric-card h4{color:var(--navy);font-size:.9em;margin-bottom:4px}
+.metric-card .items{text-align:left;font-size:.85em;color:var(--gray)}
+
+/* Conversion funnel */
+.funnel{max-width:600px;margin:20px auto}
+.funnel-row{display:flex;align-items:center;margin-bottom:6px}
+.funnel-label{width:180px;text-align:right;padding-right:12px;font-size:.82em;font-weight:600;color:var(--navy)}
+.funnel-bar-wrap{flex:1}
+.funnel-bar{height:28px;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:.78em;font-weight:700;color:var(--white);transition:.3s}
+.funnel-rate{width:60px;text-align:center;font-size:.78em;font-weight:700;color:var(--orange);padding-left:8px}
+
+/* Org type cards */
+.org-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.org-card{border-radius:14px;padding:24px;color:var(--white)}
+.org-card h3{margin-bottom:10px;font-size:1.2em}
+.org-card ul{padding-left:18px;font-size:.9em}
+.org-card li{margin-bottom:4px}
+.org-dmo{background:linear-gradient(135deg,var(--navy),#16213e)}
+.org-agency{background:linear-gradient(135deg,var(--orange),#e55a2b)}
+.org-hotel{background:linear-gradient(135deg,var(--gray),#495057)}
+
+/* Industry stats */
+.industry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.industry-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);text-align:center}
+.industry-card .big{font-size:2em;font-weight:800;color:var(--orange)}
+.industry-card .context{font-size:.85em;color:var(--gray);margin-top:6px}
+
+/* Action plan */
+.week-card{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 3px 16px rgba(0,0,0,.07);margin-bottom:20px}
+.week-header{padding:14px 24px;color:var(--white);font-weight:700;font-size:1.05em}
+.week-body{padding:20px 24px}
+.week-body ol{padding-left:20px}
+.week-body li{padding:6px 0;font-size:.92em}
+.w1 .week-header{background:var(--orange)}
+.w2 .week-header{background:var(--navy)}
+.w3 .week-header{background:var(--blue)}
+.w4 .week-header{background:var(--green)}
+
+/* Chart container */
+.chart-wrap{max-width:650px;margin:20px auto;background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+
+/* Quote */
+.quote{background:var(--navy);color:var(--white);border-radius:12px;padding:24px 30px;margin:24px 0;font-style:italic;font-size:1em;position:relative}
+.quote::before{content:'"';font-size:3em;color:var(--orange);position:absolute;top:4px;left:12px;font-style:normal;line-height:1}
+.quote .attr{color:var(--orange);font-style:normal;font-weight:600;margin-top:8px;font-size:.88em}
+
+/* Responsive */
+@media(max-width:768px){
+  header h1{font-size:1.6em}
+  .section-header h2{font-size:1.5em}
+  .metrics-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  nav a{font-size:.72em;padding:4px 8px}
+  .flow{gap:4px}
+  .flow-node{padding:8px 10px;font-size:.72em;min-width:70px}
+  .vtl{flex-direction:column}
+  .vtl-block{min-height:50px;padding:10px}
+  .lc-grid{grid-template-columns:1fr;gap:16px}
+  .lc-sync{display:none}
+  .pb-grid{grid-template-columns:1fr}
+}
+
+/* Print */
+@media print{
+  nav{display:none}
+  section{padding:20px 0;page-break-inside:avoid}
+  .stage-card{page-break-inside:avoid}
+  body{font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <div class="subtitle">PIPELINE MASTER DOCUMENT</div>
+    <h1>WTW <span>Pipeline</span> Guide</h1>
+    <p>The definitive playbook for pipeline structure, sales stages, metrics & execution</p>
+    <p style="opacity:.5;font-size:.82em;margin-top:6px">February 2026 — Confidential</p>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#part1">1. Current State</a>
+    <a href="#lifecycle">2. Lifecycle Map</a>
+    <a href="#part2">3. New Pipeline</a>
+    <a href="#part3">4. Metrics</a>
+    <a href="#part4">5. Org Types</a>
+    <a href="#part5">6. Industry</a>
+    <a href="#part6">7. Action Plan</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- PART 1: WHERE WE ARE -->
+<!-- ============================================================ -->
+<section id="part1">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 1</span>
+    <h2>Where We Are — Current State</h2>
+    <p>An honest look at the existing pipeline and what it's costing us</p>
+  </div>
+
+  <!-- Current Pipeline Flow -->
+  <div class="card navy">
+    <h3>1.1 — The Current Pipeline (HubSpot)</h3>
+    <div class="flow">
+      <div class="flow-node" style="background:var(--red)">SQL /<br>Prospecting<small>MERGED</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Opportunity</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Demo Stage</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Negotiation</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Closing Soon</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">Deal Closed Won</div>
+    </div>
+    <div class="flow" style="margin-top:0;padding-top:0">
+      <div class="flow-node gray">Circle Back Later</div>
+      <span style="padding:0 12px;color:var(--gray)">|</span>
+      <div class="flow-node red">Closed Lost</div>
+    </div>
+  </div>
+
+  <!-- What's Wrong -->
+  <h3 style="color:var(--navy);margin:30px 0 16px;font-size:1.3em;text-align:center">1.2 — What's Wrong: The Diagnosis</h3>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <h4>Structural Problems</h4>
+      <ul>
+        <li>SQL and Prospecting are MERGED — mixing "found a name" with "qualified to sell"</li>
+        <li>No enrichment stage — leads enter raw, never get enriched</li>
+        <li>No Discovery stage — team jumps to demo without understanding pain</li>
+        <li>No Propose stage — negotiation starts without a formal proposal</li>
+        <li>Lifecycle and Pipeline are MIXED — SQL is a lifecycle stage used as pipeline</li>
+        <li>No standardized entry criteria — anyone can move deals anywhere</li>
+        <li>"Opportunity" is vague — what does it actually mean?</li>
+      </ul>
+    </div>
+    <div class="problem-card">
+      <h4>Process Problems</h4>
+      <ul>
+        <li>No enrichment process — SDR receives lead, does nothing with data</li>
+        <li>No clear handoff between SDR and AE</li>
+        <li>No "next action" requirement per deal (Truth System violation)</li>
+        <li>Team tries to "generate the problem" in Negotiation instead of Discovery</li>
+        <li>No time limits per stage — deals rot forever</li>
+        <li>No automation or alerts for stuck deals</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Data Problems -->
+  <h4 style="color:var(--red);margin:28px 0 12px;text-align:center;font-size:1.1em">Data Problems — From 1,491 Deal Analysis</h4>
+  <div class="stat-row">
+    <div class="stat-card"><div class="num">923</div><div class="label">Deals stuck in SQL<br>(62% of all deals)</div></div>
+    <div class="stat-card"><div class="num">83%</div><div class="label">Deals with NO close date</div></div>
+    <div class="stat-card"><div class="num">91%</div><div class="label">Missing country data</div></div>
+    <div class="stat-card"><div class="num">96%</div><div class="label">Negotiation deals without close date</div></div>
+    <div class="stat-card"><div class="num">0</div><div class="label">Deals scoring 8+ on triage</div></div>
+    <div class="stat-card"><div class="num">988</div><div class="label">SQL deals need complete reset</div></div>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote">
+    <div style="padding-left:30px">
+      "We're not where we planned to be" — Q4 2025 slowdown extending into Q1 2026. Q2 needs $2.4M (60 deals) — impossible without fixing pipeline velocity. 2.6% monthly churn partly because onboarding is slow.
+      <div class="attr">— CEO</div>
+    </div>
+  </div>
+
+  <!-- Chart: current state -->
+  <div class="chart-wrap">
+    <canvas id="currentPipeChart"></canvas>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LIFECYCLE STAGE MAPPING -->
+<!-- ============================================================ -->
+<section id="lifecycle">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 2</span>
+    <h2>Lifecycle & Pipeline Map</h2>
+    <p>How Contact Lifecycle and Deal Pipeline work together — two systems, one truth</p>
+  </div>
+
+  <div class="lc-map">
+    <h3>Contact Lifecycle ↔ Deal Pipeline</h3>
+    <div class="lc-sub">Lifecycle tracks the PERSON. Pipeline tracks the DEAL. They sync but never conflict.</div>
+
+    <div class="lc-grid">
+      <!-- LEFT: Contact Lifecycle -->
+      <div class="lc-col">
+        <h4>Contact Lifecycle</h4>
+        <div class="lc-pill" style="background:#334155;color:#94a3b8">Subscriber</div>
+        <div class="lc-pill" style="background:#312e81;color:#a5b4fc">Lead</div>
+        <div class="lc-pill" style="background:#164e63;color:#67e8f9">MQL</div>
+        <div class="lc-pill" style="background:#78350f;color:#fcd34d">SQL</div>
+        <div class="lc-pill" style="background:#064e3b;color:#6ee7b7">Opportunity</div>
+        <div class="lc-pill" style="background:#14532d;color:#86efac;border:2px solid #4ade80">Customer</div>
+        <div class="lc-pill" style="background:#581c87;color:#d8b4fe">Evangelist</div>
+      </div>
+
+      <!-- MIDDLE: Sync -->
+      <div class="lc-sync">
+        <div class="lc-sync-label">SYNC</div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+        <div class="lc-dot"></div>
+      </div>
+
+      <!-- RIGHT: Deal Pipeline -->
+      <div class="lc-pipeline">
+        <h4>Deal Pipeline: Accessibility Verified New Clients</h4>
+
+        <div class="pp-group">
+          <div class="pp-group-label">Pre-Pipeline (Enrichment Zone)</div>
+          <div class="pp-pills">
+            <div class="pp-pill" style="background:#312e81;color:#a5b4fc">🔍 Prospecting</div>
+            <div class="pp-pill" style="background:#164e63;color:#67e8f9">📥 MQL</div>
+            <div class="pp-pill" style="background:#3b0764;color:#d8b4fe">📞 Outreach</div>
+          </div>
+        </div>
+
+        <div class="pp-group" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3)">
+          <div class="pp-group-label" style="color:#fcd34d">⛔ Qualification Gate</div>
+          <div class="pp-pills">
+            <div class="pp-pill" style="background:#78350f;color:#fcd34d">✅ SQL — Pass/Fail Check ⛔</div>
+          </div>
+        </div>
+
+        <div class="pp-group">
+          <div class="pp-group-label">Pipeline (Sales Zone)</div>
+          <div class="pp-pills">
+            <div class="pp-pill" style="background:#064e3b;color:#6ee7b7">🔎 Discovery</div>
+            <div class="pp-pill" style="background:#1e3a5f;color:#93c5fd">🎯 Demo</div>
+            <div class="pp-pill" style="background:#312e81;color:#c4b5fd">📄 Propose</div>
+            <div class="pp-pill" style="background:#7f1d1d;color:#fca5a5">💰 Negotiation</div>
+            <div class="pp-pill" style="background:#7c2d12;color:#fdba74">✍️ Closing</div>
+          </div>
+        </div>
+
+        <div class="pp-group">
+          <div class="pp-group-label">Exit</div>
+          <div class="pp-pills">
+            <div class="pp-pill" style="background:#14532d;color:#86efac">Won ✅</div>
+            <div class="pp-pill" style="background:#7f1d1d;color:#fca5a5">Lost ❌</div>
+            <div class="pp-pill" style="background:#78350f;color:#fde68a">Circle Back 🔄</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sync descriptions -->
+    <div style="max-width:800px;margin:20px auto 0;padding-left:200px">
+      <div style="display:flex;flex-direction:column;gap:3px;font-size:.78em;color:#64748b">
+        <div>← Prospecting, Outreach → <strong style="color:#a5b4fc">Lead</strong></div>
+        <div>← MQL stage, positive reply → <strong style="color:#67e8f9">MQL</strong></div>
+        <div>← SQL gate passed (4 checks ✅) → <strong style="color:#fcd34d">SQL</strong></div>
+        <div>← Discovery → Closing Soon → <strong style="color:#6ee7b7">Opportunity</strong></div>
+        <div>← Closed Won ✅ → <strong style="color:#86efac">Customer</strong></div>
+        <div>← Manual (CS/Growth) → <strong style="color:#d8b4fe">Evangelist</strong></div>
+      </div>
+    </div>
+
+    <div class="lc-rules">
+      <div class="lc-rule"><span style="font-size:1.2em">⬆️</span> Lifecycle only goes UP — never down</div>
+      <div class="lc-rule"><span style="font-size:1.2em">🔴</span> Lost deal ≠ lost relationship — contact stays</div>
+      <div class="lc-rule"><span style="font-size:1.2em">🔄</span> Circle Back = deal paused, not contact paused</div>
+      <div class="lc-rule"><span style="font-size:1.2em">👤</span> One contact can have multiple deals over time</div>
+    </div>
+  </div>
+
+  <!-- Lifecycle stages table -->
+  <h3 style="color:var(--navy);margin:30px 0 16px;font-size:1.2em">Contact Lifecycle Definitions</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:.9em">
+    <tr style="background:#f1f5f9"><th style="padding:10px 12px;text-align:left;border:1px solid #e2e8f0">Stage</th><th style="padding:10px 12px;text-align:left;border:1px solid #e2e8f0">Definition</th><th style="padding:10px 12px;text-align:left;border:1px solid #e2e8f0">Trigger (Pipeline Stage)</th></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>Subscriber</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Newsletter only</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Content form</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>Lead</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Identified, not yet engaged</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Imported, Prospecting, Outreach</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>MQL</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Intent or positive engagement</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Inbound, referral, positive reply</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>SQL</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Qualified — passes 4 checks</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Deal passes SQL gate</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>Opportunity</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Active deal in pipeline</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Deal enters Discovery+</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>Customer</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Signed contract</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Deal Won</td></tr>
+    <tr><td style="padding:9px 12px;border:1px solid #e2e8f0"><strong>Evangelist</strong></td><td style="padding:9px 12px;border:1px solid #e2e8f0">Refers, case study, advocate</td><td style="padding:9px 12px;border:1px solid #e2e8f0">Manual (CS/Growth)</td></tr>
+  </table>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PART 2: WHERE WE'RE GOING -->
+<!-- ============================================================ -->
+<section id="part2">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 3</span>
+    <h2>Where We're Going — The New Pipeline</h2>
+    <p>Pipeline v2: structured, gated, measurable</p>
+  </div>
+
+  <!-- 2.1 Visual Flow -->
+  <h3 style="color:var(--navy);margin-bottom:16px;font-size:1.2em">3.1 — Pipeline v2 Flow</h3>
+
+  <div class="zone pre">
+    <span class="zone-label">PRE-PIPELINE — Enrichment Zone (SDR owns)</span>
+    <div class="flow">
+      <div class="flow-node blue">Lead Sources<small>Events, LinkedIn, Inbound, Referrals, Partnerships</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">MQL<small>Capture · 24hr</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">Prospecting<small>Enrichment · Clay/Apollo</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node blue">Outreach<small>Multi-channel · 21d</small></div>
+    </div>
+    <div style="text-align:center;font-size:.82em;color:var(--blue);font-weight:600;margin-top:4px">
+      Target: 70% of prospected leads → Outreach | 30% filtered (not ICP)
+    </div>
+  </div>
+
+  <div class="zone gate">
+    <span class="zone-label">⛔ SQL — QUALIFICATION GATE (Pass/Fail checkpoint)</span>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:1em;font-weight:700;color:#92400e;margin-bottom:8px">SQL is NOT a stage you sit in — it's a qualification checkpoint</div>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <span style="background:#fff;border:2px solid #22c55e;padding:8px 16px;border-radius:8px;font-weight:700;color:#166534">✅ Authority</span>
+        <span style="background:#fff;border:2px solid #22c55e;padding:8px 16px;border-radius:8px;font-weight:700;color:#166534">✅ Need</span>
+        <span style="background:#fff;border:2px solid #22c55e;padding:8px 16px;border-radius:8px;font-weight:700;color:#166534">✅ Budget</span>
+        <span style="background:#fff;border:2px solid #22c55e;padding:8px 16px;border-radius:8px;font-weight:700;color:#166534">✅ Timeline</span>
+      </div>
+      <div style="margin-top:10px;font-size:.88em;color:#92400e">All 4 = YES → enters Pipeline | Any missing → stays in Outreach or Circle Back</div>
+      <div style="margin-top:6px;font-size:.82em;color:#b45309">SDR qualifies → AE takes ownership. This is the handoff point.</div>
+    </div>
+  </div>
+
+  <div class="zone sales">
+    <span class="zone-label">PIPELINE — Sales Zone (AE owns)</span>
+    <div class="flow">
+      <div class="flow-node">Discovery<small>Understanding · 14d</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Demo<small>Presentation · 14d</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Propose<small>Formalization · 30d</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Negotiation<small>Terms · 45d</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Closing Soon<small>Signature · 21d</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node green">WON</div>
+    </div>
+    <div style="text-align:center;margin-top:10px;font-size:.85em;color:var(--gray)">
+      Any stage can exit to → <span style="background:var(--gray);color:#fff;padding:2px 8px;border-radius:4px;font-size:.9em">Circle Back</span> or <span style="background:var(--red);color:#fff;padding:2px 8px;border-radius:4px;font-size:.9em">Closed Lost</span>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 3.2 Stage-by-Stage Playbook -->
+  <!-- ============================================ -->
+  <h3 style="color:var(--navy);margin:36px 0 20px;font-size:1.2em">3.2 — Stage-by-Stage Playbook</h3>
+
+  <!-- ======= MQL ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--blue)">
+      <h3>📥 MQL — Marketing Qualified Lead</h3>
+      <span class="badge">Pre-Pipeline</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Capture</strong> — Log the inbound lead, respond fast, route to right path
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          Marketing (auto-assigns to SDR round-robin)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          24hr response, 48hr qualify/route
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Response time &lt;24hr, MQL volume/week
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          Inbound form fill, demo request, referral intro, event scan, RFP response, partner intro
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Prospecting:</strong> Needs enrichment before outreach</li>
+            <li><strong>Success → SQL Gate:</strong> Strong referral, clear intent, passes 4 checks immediately</li>
+            <li><strong>Fail → Closed Lost:</strong> Anti-ICP</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools/Channels</div>
+          HubSpot Forms, Website Chat, Event Scanner Apps, Referral Intros (email), RFP Portals
+        </div>
+      </div>
+      <p style="font-size:.9em"><strong>Actions:</strong> Log in HubSpot with source, basic contact info. Respond to the lead immediately.</p>
+      <div class="props">
+        <span class="prop">Name</span><span class="prop">Email</span><span class="prop">Company</span><span class="prop">Source</span><span class="prop">Event (if applicable)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= PROSPECTING ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--blue)">
+      <h3>🔍 Prospecting — SDR Enrichment</h3>
+      <span class="badge">Pre-Pipeline</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Enrichment</strong> — Research the DMO before making contact. Build intelligence. No selling here.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          SDR
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          48 hours max per lead
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Enrichment completion rate, 70% → Outreach (30% filtered as not ICP)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          DMO identified from: research list, event attendee list, MQL needing enrichment, import, referral target
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Outreach:</strong> Research complete, ICP confirmed, contact validated (target: 70%)</li>
+            <li><strong>Fail → Closed Lost:</strong> Anti-ICP — too small, not tourism, competitor (target: 30%)</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools/Channels</div>
+          <strong>Clay</strong> (company enrichment, data waterfall), <strong>Apollo</strong> (contact finding, email verification), <strong>LinkedIn</strong> (DM research, org chart), <strong>DMO Website</strong> (A11Y page check, team page), <strong>HubSpot</strong> (property fill)
+        </div>
+      </div>
+
+      <h4 style="color:var(--navy);font-size:.95em;margin:16px 0 8px">Enrichment Checklist (SDR completes before Outreach):</h4>
+      <ol>
+        <li><strong>Clay/Apollo lookup:</strong> Full contact info, company size, funding signals, tech stack</li>
+        <li><strong>LinkedIn research:</strong> Decision maker identified, org chart understood, recent posts/activity</li>
+        <li><strong>Website check:</strong> Existing accessibility page? A11Y initiatives? Team structure?</li>
+        <li><strong>Tier classification:</strong> Assign ICP Tier (1-5) based on org size, budget signals, fit</li>
+        <li><strong>A11Y Maturity estimate:</strong> Advanced / Committed / Aware / Unaware (from public info)</li>
+        <li><strong>Budget signals:</strong> Tax funded? Membership? Government grant? Tourism levy?</li>
+        <li><strong>Document in HubSpot:</strong> All properties filled before moving to Outreach</li>
+      </ol>
+      <div class="props">
+        <span class="prop">Full Contact</span><span class="prop">Company URL</span><span class="prop">DMO Tier</span><span class="prop">Budget Type</span><span class="prop">A11Y Maturity (est.)</span><span class="prop">Available Listings</span><span class="prop">Decision Maker ID'd</span><span class="prop">Country</span><span class="prop">Organization Type</span>
+      </div>
+      <div class="example-box">
+        <strong>Example</strong>
+        SDR receives Visit Phoenix from event. Opens Clay → finds $2M marketing budget, director of partnerships is the key contact, they did a basic accessibility audit last year. Tier 1. Moves to Outreach.
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= OUTREACH ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--blue)">
+      <h3>📞 Outreach — Multi-Channel Activation</h3>
+      <span class="badge">Pre-Pipeline</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Activation</strong> — Get a response and book a meeting via multiple channels
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          SDR
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          21 days max (full sequence, 3-6 touches)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Reply rate, meeting booked rate, Outreach → SQL conversion (target: 20%)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          First outbound touch sent (any channel). Enrichment complete from Prospecting.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → SQL Gate:</strong> Positive reply + passes 4 qualification checks</li>
+            <li><strong>Pause → Circle Back:</strong> 21d, 6 touches, no response (but org is ICP fit)</li>
+            <li><strong>Fail → Closed Lost:</strong> Explicit no / bounced / anti-ICP</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools/Channels (Multi-Channel — Not Just Email!)</div>
+          <ul>
+            <li><strong>Email sequence:</strong> 3-5 personalized emails over 2-3 weeks (reference THEIR pain, not WTW features)</li>
+            <li><strong>LinkedIn:</strong> Connection request + InMail + comment on their posts</li>
+            <li><strong>Phone calls:</strong> Direct dial after warm email touch</li>
+            <li><strong>Event follow-ups:</strong> Post-conference personalized outreach within 48hr</li>
+            <li><strong>Referral introductions:</strong> Warm intros from existing customers or partners</li>
+            <li><strong>Video messages:</strong> Loom/Vidyard personalized 60-sec clips for Tier 1</li>
+          </ul>
+        </div>
+      </div>
+      <div style="background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;padding:14px;margin-top:12px;font-size:.88em">
+        <strong style="color:#0369a1">Multi-Channel Sequence (example for Tier 1):</strong><br>
+        Day 1: Email #1 (pain-based) + LinkedIn connect → Day 3: LinkedIn message → Day 5: Phone call → Day 8: Email #2 (case study) → Day 12: Video message → Day 16: Email #3 (event/urgency) → Day 21: Final touch or Circle Back
+      </div>
+      <div class="example-box">
+        <strong>Good Email</strong>
+        "Vi que Visit Nashville lanzó una iniciativa de turismo inclusivo. El 27% de viajeros tienen alguna discapacidad y gastan $58B/año en travel. ¿Tienen forma de medir cuántos viajeros con discapacidad están visitando Nashville?"
+      </div>
+      <div class="example-box bad">
+        <strong>Bad Email</strong>
+        "Somos Wheel the World, hacemos verificación de accesibilidad. ¿Quieres una demo?"
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= SQL GATE ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:#b45309">
+      <h3>⛔ SQL — Sales Qualified Lead</h3>
+      <span class="badge">QUALIFICATION GATE — Not a Stage</span>
+    </div>
+    <div class="stage-body">
+      <div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border:2px solid #f59e0b;border-radius:10px;padding:16px;margin-bottom:16px;text-align:center">
+        <div style="font-size:1.1em;font-weight:800;color:#92400e;margin-bottom:6px">SQL is a GATE, not a stage</div>
+        <div style="font-size:.88em;color:#a16207">Deals don't "sit" in SQL. They pass through it. If they can't pass, they stay in Outreach or go to Circle Back.</div>
+      </div>
+
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Qualification</strong> — Confirm 4 criteria before pipeline entry. SDR → AE handoff.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          SDR (qualifies) → AE (takes ownership)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          Max 3 days as a checkpoint. Not a holding stage.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          SQL pass rate, SQL → Discovery conversion (target: 90%)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria (ALL 4 must be YES)</div>
+          <ul>
+            <li><strong>Authority:</strong> Talking to decision maker or strong champion</li>
+            <li><strong>Need:</strong> Identified a real problem or initiative</li>
+            <li><strong>Budget:</strong> Can they pay? (>$20K budget, funding identified)</li>
+            <li><strong>Timeline:</strong> Is there urgency? (fiscal year, event, mandate)</li>
+          </ul>
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Pass → Discovery:</strong> All 4 checks YES, AE takes ownership, Discovery call scheduled</li>
+            <li><strong>Fail → Outreach:</strong> 1 criteria missing — work to resolve, max 14 days</li>
+            <li><strong>Fail → Circle Back:</strong> 2+ criteria missing but org is ICP</li>
+            <li><strong>Fail → Closed Lost:</strong> Not ICP after deeper review</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          HubSpot (4 checkbox properties enforced), Internal handoff meeting/Slack, Discovery call scheduling
+        </div>
+      </div>
+      <div class="example-box" style="margin-top:14px">
+        <strong>Example</strong>
+        "The director of Visit Chicago said they have $50K allocated for accessibility this year and wants to see a demo before March." → Authority ✓ Need ✓ Budget ✓ Timeline ✓ → SQL PASS → Enter Pipeline
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= DISCOVERY ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--navy)">
+      <h3>🔎 Discovery</h3>
+      <span class="badge">Pipeline Stage 1</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Understanding</strong> — Gap Selling call. Listen, don't pitch. Understand the problem before showing anything.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          AE (leads the call)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          Call within 7 days, summary within 24hrs post-call. Max 14 days in stage.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Gap Canvas completion rate, Discovery → Demo conversion (target: 70%)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          SQL gate passed. Discovery call date set. Decision maker or champion confirmed.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Demo:</strong> GAP identified, scope clear, AE says "Continue"</li>
+            <li><strong>Pause → Circle Back:</strong> GAP not urgent / timing wrong</li>
+            <li><strong>Fail → Closed Lost:</strong> No GAP found, not a fit</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          Zoom/Google Meet, Gap Selling Canvas template, HubSpot notes, Discovery Summary Doc (internal), CRM data from enrichment
+        </div>
+      </div>
+
+      <p style="font-size:.9em;margin-bottom:10px"><strong>DO NOT SELL. LISTEN.</strong> This is where you "generate the problem" — by helping them see what they don't see.</p>
+      <p style="font-size:.88em;color:var(--navy);font-weight:600;margin-bottom:6px">Gap Selling Questions:</p>
+      <ul>
+        <li>"¿Cuántos viajeros con discapacidad reciben al año?" <em style="color:var(--gray)">(probably don't know → gap)</em></li>
+        <li>"¿Cómo miden el impacto económico del turismo accesible?" <em style="color:var(--gray)">(don't measure → gap)</em></li>
+        <li>"¿Qué pasa si un viajero con silla de ruedas llega y el hotel no está preparado?" <em style="color:var(--gray)">(reputation risk)</em></li>
+        <li>"¿Sus competidores están haciendo algo en accesibilidad?" <em style="color:var(--gray)">(FOMO)</em></li>
+      </ul>
+      <p style="font-size:.88em;margin-top:10px">Identify A11Y Maturity: <strong>None → Aware → Active → Advanced</strong></p>
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-top:12px;font-size:.88em">
+        <strong style="color:#92400e">CRITICAL:</strong> If you reach Demo without completing Discovery, you'll waste everyone's time with a generic presentation.
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= DEMO ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--navy)">
+      <h3>🎯 Demo</h3>
+      <span class="badge">Pipeline Stage 2</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Presentation</strong> — Show the solution custom to THEIR pain points from Discovery. Be a consultant, not a slide reader.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          AE
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          14 days post-discovery. Proposal in 5 days post-demo.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Demo → Propose conversion (target: 60%), demo show rate
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          Discovery Completed + Gap Canvas done + AE Decision = "Continue"
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Propose:</strong> Client interested, quote being prepared</li>
+            <li><strong>Back → Discovery:</strong> Demo cancelled, needs more discovery</li>
+            <li><strong>Pause → Circle Back:</strong> "Interesting but not now"</li>
+            <li><strong>Fail → Closed Lost:</strong> Not interested after seeing solution</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          Zoom/Meet, Custom demo deck (built from Discovery), Economic Impact Dashboard, Case study library, Meeting recap template
+        </div>
+      </div>
+      <ol>
+        <li>Custom demo based on discovery insights</li>
+        <li>Show similar DMO case studies (same tier, same region)</li>
+        <li>Show Economic Impact Dashboard with their market data</li>
+        <li>End with: "Does this solve what we discussed?"</li>
+        <li>Send meeting recap within 24h</li>
+      </ol>
+      <div class="example-box">
+        <strong>Example — Nashville</strong>
+        "Destinations como Grand Rapids aumentaron 23% en reservas accesibles. Nashville tiene 150+ hoteles y 0 verificados. El mercado potencial es $12M/año."
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= PROPOSE ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--navy)">
+      <h3>📄 Propose</h3>
+      <span class="badge">Pipeline Stage 3</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Formalization</strong> — Send formal proposal with scope, pricing, ROI. Quality-gated (score ≥24/30).
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          AE
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          Response in 14 days, max 30 days in stage
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Proposal Quality Score (min 24/30), Propose → Negotiation conversion (target: 50%)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          Amount > $0, Close Date set, Demo completed
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Negotiation:</strong> Client engages — questions, counter-offer</li>
+            <li><strong>Pause → Circle Back:</strong> "Let me think about it" / no response 30d</li>
+            <li><strong>Fail → Closed Lost:</strong> Explicit rejection</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          Proposal template (Gap-based), PandaDoc/Google Docs, ROI calculator, Case study library, HubSpot Quotes
+        </div>
+      </div>
+      <ol>
+        <li>Custom proposal within 48h of demo</li>
+        <li>Include specific ROI projection for their destination</li>
+        <li>Include scope: number of listings, timeline, deliverables</li>
+        <li>Include case study ROI from similar DMO</li>
+        <li>Send and schedule follow-up call in 5 days</li>
+      </ol>
+      <div class="props">
+        <span class="prop">Quote Amount</span><span class="prop">Line Items</span><span class="prop">Proposal Sent Date</span><span class="prop">Quality Score ≥24</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= NEGOTIATION ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--navy)">
+      <h3>💰 Negotiation</h3>
+      <span class="badge">Pipeline Stage 4</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Terms</strong> — Align pricing, scope, and timeline. Protect value. Close Date MANDATORY.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          AE (Head of Growth joins for Tier 1 deals)
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          Max 45 days, weekly check-ins mandatory
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Negotiation → Won conversion (target: 60%), avg discount %, days in stage
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          Close Date MANDATORY, Amount > $0, Proposal sent
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Closing Soon:</strong> Verbal yes / PO received</li>
+            <li><strong>Pause → Circle Back:</strong> "Not yet" / stalled</li>
+            <li><strong>Fail → Closed Lost:</strong> "No" / no activity 30d past close date</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          HubSpot deal tracking, Negotiation playbook, Discount approval matrix, Weekly pipeline review
+        </div>
+      </div>
+      <ol>
+        <li>Handle objections using Gap Selling (return to pain, don't discount)</li>
+        <li>If "too expensive" → revisit Discovery pain, show ROI</li>
+        <li>Weekly touch-base — never go 7+ days without contact</li>
+        <li>Document every conversation — facts, not intentions</li>
+        <li>Identify blockers: legal, budget approval, champion change</li>
+      </ol>
+      <div class="props">
+        <span class="prop">Close Date (MANDATORY)</span><span class="prop">Negotiation Notes</span><span class="prop">Contract Length</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= CLOSING SOON ======= -->
+  <div class="stage-card">
+    <div class="stage-header" style="background:var(--green)">
+      <h3>✍️ Closing Soon</h3>
+      <span class="badge">Pipeline Stage 5</span>
+    </div>
+    <div class="stage-body">
+      <div class="pb-grid">
+        <div class="pb-item">
+          <div class="pb-label">🎯 Objective</div>
+          <strong>Signature</strong> — Contract sent, get it signed FAST. If stuck >21 days, something's wrong.
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">👤 Owner</div>
+          AE
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">⏱️ Time Limit</div>
+          Max 21 days
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">📊 Key Metric</div>
+          Days to signature, Closing → Won conversion
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">✅ Entry Criteria</div>
+          Contract Sent Date recorded, verbal commitment received
+        </div>
+        <div class="pb-item">
+          <div class="pb-label">🚪 Exit Criteria</div>
+          <ul>
+            <li><strong>Success → Won:</strong> Contract signed</li>
+            <li><strong>Back → Negotiation:</strong> Terms need renegotiation</li>
+            <li><strong>Pause → Circle Back:</strong> Stalled >21d</li>
+          </ul>
+        </div>
+        <div class="pb-item full">
+          <div class="pb-label">🔧 Tools</div>
+          PandaDoc/DocuSign, Contract template, Internal kickoff doc, CEO-to-CEO escalation path
+        </div>
+      </div>
+      <ol>
+        <li>Send contract</li>
+        <li>Follow-up every 3-5 days</li>
+        <li>If no signature in 21 days → CEO-to-CEO call</li>
+        <li>Prepare internal kickoff doc</li>
+      </ol>
+      <div class="props">
+        <span class="prop">Contract Sent Date</span><span class="prop">Expected Close Date</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Won / Circle Back / Lost -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:10px">
+    <div class="card green" style="text-align:center">
+      <h3 style="color:var(--green)">Won</h3>
+      <p style="font-size:.78em;font-weight:600;color:var(--navy);margin-bottom:4px">🎯 Handoff</p>
+      <p style="font-size:.85em">Celebrate + CS handoff with full deal context. Internal + external kickoff. 👤 AE → CS. ⏱️ Kickoff in 5 days.</p>
+    </div>
+    <div class="card" style="text-align:center;border-left-color:var(--gray)">
+      <h3 style="color:var(--gray)">Circle Back</h3>
+      <p style="font-size:.78em;font-weight:600;color:var(--navy);margin-bottom:4px">🎯 Nurture</p>
+      <p style="font-size:.85em">Re-contact date + reason. Max 2 per deal — 3rd forces Won or Lost. 👤 SDR + Auto. ⏱️ Re-contact date.</p>
+    </div>
+    <div class="card red" style="text-align:center">
+      <h3 style="color:var(--red)">Closed Lost</h3>
+      <p style="font-size:.78em;font-weight:600;color:var(--navy);margin-bottom:4px">🎯 Learning</p>
+      <p style="font-size:.85em">Loss reason MANDATORY. Deal dies, company stays alive. Annual win-back review. 👤 — ⏱️ Annual review.</p>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 3.3 Decision Trees -->
+  <!-- ============================================ -->
+  <h3 style="color:var(--navy);margin:36px 0 16px;font-size:1.2em">3.3 — Decision Trees</h3>
+
+  <div class="card navy">
+    <h3 style="color:var(--orange)">Prospecting → Outreach</h3>
+    <div class="tree"><span class="q">Is this a valid DMO?</span>
+├── <span class="no">NO</span> → <span class="result">Closed Lost (Not ICP)</span>
+└── <span class="yes">YES</span>
+    └── <span class="q">Decision maker identified?</span>
+        ├── <span class="no">NO</span> → <span class="result">Research more (48h max)</span>
+        └── <span class="yes">YES</span>
+            └── <span class="q">ICP Tier classified?</span>
+                ├── <span class="yes">Tier 1/2</span> → <span class="result">Outreach (priority)</span>
+                ├── <span class="yes">Tier 3</span> → <span class="result">Outreach (normal)</span>
+                └── <span class="no">Can't classify</span> → <span class="result">Circle Back</span></div>
+  </div>
+
+  <div class="card navy">
+    <h3 style="color:var(--orange)">Outreach → SQL Gate</h3>
+    <div class="tree"><span class="q">Positive response received?</span>
+├── <span class="no">NO (after full sequence)</span> → <span class="result">Circle Back (set re-contact date)</span>
+└── <span class="yes">YES</span>
+    └── <span class="q">Check 4 SQL Criteria:</span>
+        ├── <span class="q">Authority?</span>  ✓/✗
+        ├── <span class="q">Need?</span>      ✓/✗
+        ├── <span class="q">Budget?</span>    ✓/✗
+        └── <span class="q">Timeline?</span>  ✓/✗
+            ├── <span class="yes">ALL 4 = YES</span> → <span class="result">SQL PASS → Enter Pipeline (Discovery)</span>
+            ├── <span class="no">2+ missing</span> → <span class="result">Stay in Outreach / Circle Back</span>
+            └── <span class="no">1 missing</span> → <span class="result">Work to resolve, max 14 days</span></div>
+  </div>
+
+  <div class="card navy">
+    <h3 style="color:var(--orange)">Discovery → Demo</h3>
+    <div class="tree"><span class="q">Discovery call completed?</span>
+├── <span class="no">NO (14 days passed)</span> → <span class="result">Circle Back</span>
+└── <span class="yes">YES</span>
+    └── <span class="q">Real pain identified & documented?</span>
+        ├── <span class="no">NO</span> → <span class="result">Circle Back (no real pain/urgency)</span>
+        └── <span class="yes">YES</span>
+            └── <span class="q">A11Y Maturity level assessed?</span>
+                ├── <span class="no">NO</span> → <span class="result">Schedule follow-up discovery</span>
+                └── <span class="yes">YES</span> → <span class="result">Demo (personalized based on findings)</span></div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- 3.4 Time Limits — Visual Timeline -->
+  <!-- ============================================ -->
+  <h3 style="color:var(--navy);margin:36px 0 16px;font-size:1.2em">3.4 — Time Limits Summary</h3>
+
+  <div class="vtl">
+    <div class="vtl-block" style="background:#3b82f6;flex:1">
+      <div class="vtl-stage">MQL</div>
+      <div class="vtl-days">2d</div>
+      <div class="vtl-type">Capture</div>
+    </div>
+    <div class="vtl-block" style="background:#6366f1;flex:1.2">
+      <div class="vtl-stage">Prospecting</div>
+      <div class="vtl-days">2d</div>
+      <div class="vtl-type">Enrichment</div>
+    </div>
+    <div class="vtl-block" style="background:#8b5cf6;flex:3">
+      <div class="vtl-stage">Outreach</div>
+      <div class="vtl-days">21d</div>
+      <div class="vtl-type">Activation</div>
+    </div>
+    <div class="vtl-block" style="background:#f59e0b;flex:.8;border:3px solid #92400e">
+      <div class="vtl-stage">⛔ SQL</div>
+      <div class="vtl-days">3d</div>
+      <div class="vtl-type">Gate</div>
+    </div>
+    <div class="vtl-block" style="background:#0f172a;flex:2">
+      <div class="vtl-stage">Discovery</div>
+      <div class="vtl-days">14d</div>
+      <div class="vtl-type">Understanding</div>
+    </div>
+    <div class="vtl-block" style="background:#1e3a5f;flex:2">
+      <div class="vtl-stage">Demo</div>
+      <div class="vtl-days">14d</div>
+      <div class="vtl-type">Presentation</div>
+    </div>
+    <div class="vtl-block" style="background:#312e81;flex:4">
+      <div class="vtl-stage">Propose</div>
+      <div class="vtl-days">30d</div>
+      <div class="vtl-type">Formalization</div>
+    </div>
+    <div class="vtl-block" style="background:#7f1d1d;flex:6">
+      <div class="vtl-stage">Negotiation</div>
+      <div class="vtl-days">45d</div>
+      <div class="vtl-type">Terms</div>
+    </div>
+    <div class="vtl-block" style="background:#166534;flex:3">
+      <div class="vtl-stage">Closing</div>
+      <div class="vtl-days">21d</div>
+      <div class="vtl-type">Signature</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:12px 16px;background:var(--white);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+    <div>
+      <span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:3px;margin-right:6px"></span>
+      <strong style="font-size:.82em;color:var(--blue)">Pre-Pipeline</strong>
+      <span style="font-size:.78em;color:var(--gray);margin-left:4px">(SDR owns)</span>
+    </div>
+    <div>
+      <span style="display:inline-block;width:12px;height:12px;background:#f59e0b;border-radius:3px;margin-right:6px;border:1px solid #92400e"></span>
+      <strong style="font-size:.82em;color:#b45309">SQL Gate</strong>
+      <span style="font-size:.78em;color:var(--gray);margin-left:4px">(checkpoint)</span>
+    </div>
+    <div>
+      <span style="display:inline-block;width:12px;height:12px;background:var(--navy);border-radius:3px;margin-right:6px"></span>
+      <strong style="font-size:.82em;color:var(--navy)">Pipeline</strong>
+      <span style="font-size:.78em;color:var(--gray);margin-left:4px">(AE owns)</span>
+    </div>
+    <div>
+      <strong style="font-size:.88em;color:var(--navy)">Max cycle:</strong>
+      <span style="font-size:.88em;color:var(--gray)"> ~152 days (~5 months)</span>
+    </div>
+    <div>
+      <strong style="font-size:.88em;color:var(--green)">Target:</strong>
+      <span style="font-size:.88em;color:var(--gray)"> 60-90 days</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PART 3: METRICS DASHBOARD -->
+<!-- ============================================================ -->
+<section id="part3">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 4</span>
+    <h2>Metrics Dashboard</h2>
+    <p>The numbers that matter — from 30X Sales Foundations</p>
+  </div>
+
+  <!-- North Stars -->
+  <h3 style="color:var(--navy);margin-bottom:16px;font-size:1.2em">4.1 — The 3 North Stars</h3>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="icon" style="color:var(--blue)">&#9650;</div>
+      <h4>TOFU — Top of Funnel</h4>
+      <div class="items">
+        <p>Pipeline created (weekly)</p>
+        <p>CAC by role</p>
+        <p>CAC by segment</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="icon" style="color:var(--orange)">&#9646;</div>
+      <h4>MOFU — Middle of Funnel</h4>
+      <div class="items">
+        <p>Demos <strong>REALIZED</strong> (show rate)</p>
+        <p>Not demos scheduled</p>
+        <p>Discovery completion rate</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="icon" style="color:var(--green)">&#9660;</div>
+      <h4>BOFU — Bottom of Funnel</h4>
+      <div class="items">
+        <p>Win rate by segment</p>
+        <p>By ACV, not company size</p>
+        <p>Average deal velocity</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversion Targets -->
+  <h3 style="color:var(--navy);margin:36px 0 16px;font-size:1.2em">4.2 — Stage Conversion Targets</h3>
+  <div class="funnel">
+    <div class="funnel-row">
+      <div class="funnel-label">Prospecting → Outreach</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:70%;background:var(--blue)">70%</div></div>
+      <div class="funnel-rate">70%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">MQL → Outreach/SQL</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:70%;background:var(--blue)">70%</div></div>
+      <div class="funnel-rate">70%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Outreach → SQL Gate</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:20%;background:var(--blue)">20%</div></div>
+      <div class="funnel-rate">20%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">SQL Gate → Discovery</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:90%;background:var(--orange)">90%</div></div>
+      <div class="funnel-rate">90%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Discovery → Demo</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:70%;background:var(--navy)">70%</div></div>
+      <div class="funnel-rate">70%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Demo → Propose</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:60%;background:var(--navy)">60%</div></div>
+      <div class="funnel-rate">60%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Propose → Negotiation</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:50%;background:var(--navy)">50%</div></div>
+      <div class="funnel-rate">50%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Negotiation → Won</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:60%;background:var(--green)">60%</div></div>
+      <div class="funnel-rate">60%</div>
+    </div>
+  </div>
+  <div style="background:#e0f2fe;border:1px solid #7dd3fc;border-radius:8px;padding:12px 16px;max-width:600px;margin:12px auto;font-size:.88em">
+    <strong style="color:#0369a1">Prospecting → Outreach (NEW):</strong> Target 70% of prospected leads should move to outreach. 30% filtered as not ICP during enrichment. If below 70% → enrichment criteria too strict or lead sources poor. If above 85% → not filtering enough.
+  </div>
+  <div class="metric-big" style="margin-top:20px">
+    <div class="value">~2.6%</div>
+    <div class="desc">Overall MQL → Won conversion rate</div>
+  </div>
+
+  <!-- Conversion chart -->
+  <div class="chart-wrap">
+    <canvas id="conversionChart"></canvas>
+  </div>
+
+  <!-- Weekly Review -->
+  <h3 style="color:var(--navy);margin:36px 0 16px;font-size:1.2em">4.3 — Weekly Bottleneck Review</h3>
+  <div class="card">
+    <h3>The "Odd Number" Method (30X)</h3>
+    <p style="font-size:.9em">Each week, compare conversion rates across stages. The stage that deviates most from target is the <strong>problem of the week</strong>. Focus all coaching and process improvement there until it normalizes.</p>
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:14px;margin-top:12px;font-size:.88em">
+      <strong style="color:var(--blue)">Example:</strong> If Outreach→SQL drops to 10% (target 20%), the weekly focus is: review outreach sequences, check ICP targeting, shadow SDR calls, audit multi-channel mix.
+    </div>
+  </div>
+
+  <!-- Pipeline Math -->
+  <h3 style="color:var(--navy);margin:36px 0 16px;font-size:1.2em">4.4 — Pipeline Math (Reverse Engineering)</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card navy">
+      <h3 style="color:var(--orange)">Current Conversion Math</h3>
+      <ul style="font-size:.9em;list-style:none;padding:0">
+        <li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)"><strong>Target:</strong> $4.5M new revenue</li>
+        <li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)"><strong>Avg deal:</strong> $40K</li>
+        <li style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1)"><strong>Deals needed:</strong> 113 won deals</li>
+        <li style="padding:6px 0"><strong>At 2.6% conversion:</strong> ~4,346 MQLs needed</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3 style="color:var(--green)">Improved Conversion Math</h3>
+      <ul style="font-size:.9em;list-style:none;padding:0">
+        <li style="padding:6px 0;border-bottom:1px solid #d1fae5"><strong>Outreach→SQL:</strong> 20% → 30%</li>
+        <li style="padding:6px 0;border-bottom:1px solid #d1fae5"><strong>Win Rate:</strong> 60% → 70%</li>
+        <li style="padding:6px 0;border-bottom:1px solid #d1fae5"><strong>New overall:</strong> ~6.3%</li>
+        <li style="padding:6px 0"><strong>MQLs needed:</strong> ~1,800 (58% reduction)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Pipeline math chart -->
+  <div class="chart-wrap">
+    <canvas id="pipelineMathChart"></canvas>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PART 4: ORGANIZATION TYPE HANDLING -->
+<!-- ============================================================ -->
+<section id="part4">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 5</span>
+    <h2>Organization Type Handling</h2>
+    <p>Different org types, different playbooks — same pipeline structure</p>
+  </div>
+
+  <p style="text-align:center;font-size:.9em;color:var(--gray);margin-bottom:24px">Use <strong>Organization Type</strong> (company property) to filter — NOT a deal property.</p>
+
+  <div class="org-grid">
+    <div class="org-card org-dmo">
+      <h3>5.1 — DMO (Direct)</h3>
+      <p style="opacity:.85;font-size:.9em;margin-bottom:10px">Standard pipeline as described above</p>
+      <ul>
+        <li>Standard sales cycle (60-90 days target)</li>
+        <li>Decision maker: Director/VP of Marketing or Partnerships</li>
+        <li>Budget: Marketing or economic development funds</li>
+        <li>Value: Single contract, $20K-$100K ACV</li>
+        <li>ICP Tiers: 1 (top metros), 2 (mid-size), 3 (small/niche)</li>
+      </ul>
+    </div>
+    <div class="org-card org-agency">
+      <h3>5.2 — Agency / Partnership</h3>
+      <p style="opacity:.85;font-size:.9em;margin-bottom:10px">Miles, MMGY, Simpleview — longer cycle, higher value</p>
+      <ul>
+        <li>Longer cycle: 6-12 months</li>
+        <li>Different qualification: VP Partnerships/BD</li>
+        <li>Value = multiplier (1 agency = 50+ DMOs)</li>
+        <li>Same pipeline stages, different playbook per stage</li>
+        <li>Requires executive alignment (Head of Growth involvement)</li>
+      </ul>
+    </div>
+    <div class="org-card org-hotel">
+      <h3>5.3 — Hotel Brand</h3>
+      <p style="opacity:.85;font-size:.9em;margin-bottom:10px">Future — not implemented yet</p>
+      <ul>
+        <li>Not currently in scope</li>
+        <li>Will require separate playbook</li>
+        <li>Different value proposition (property-level)</li>
+        <li>Placeholder for H2 2026</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PART 5: INDUSTRY CONTEXT -->
+<!-- ============================================================ -->
+<section id="part5">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 6</span>
+    <h2>Industry Context</h2>
+    <p>Key stats that back up the sales approach</p>
+  </div>
+
+  <div class="industry-grid">
+    <div class="industry-card">
+      <div class="big">$92.7B</div>
+      <div class="context">Accessible tourism market (2024)</div>
+      <div style="margin-top:8px;font-size:.82em;color:var(--green);font-weight:700">→ $172.8B by 2033 (7.1% CAGR)</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">72%</div>
+      <div class="context">of DMOs say economic impact is #1 stakeholder metric <span style="font-size:.8em">(Sojern 2026)</span></div>
+    </div>
+    <div class="industry-card">
+      <div class="big">79%</div>
+      <div class="context">of NA DMOs say economic impact = top priority</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">82%</div>
+      <div class="context">of NA DMOs operate at local/municipal/regional level</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">61%</div>
+      <div class="context">say budget is their biggest challenge</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">1/3</div>
+      <div class="context">of DMOs have ≤10 FTEs → WTW must be easy to implement</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">65%</div>
+      <div class="context">use always-on campaigns (up from 51%) → supports recurring model</div>
+    </div>
+    <div class="industry-card">
+      <div class="big">49%</div>
+      <div class="context">say attribution is top barrier → WTW booking data solves this</div>
+    </div>
+  </div>
+
+  <!-- Industry chart -->
+  <div class="chart-wrap" style="margin-top:30px">
+    <canvas id="industryChart"></canvas>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PART 6: WHAT TO DO MONDAY -->
+<!-- ============================================================ -->
+<section id="part6">
+<div class="container">
+  <div class="section-header">
+    <span class="part-label">PART 7</span>
+    <h2>What to Do Monday</h2>
+    <p>4-week action plan to go from current state to Pipeline v2</p>
+  </div>
+
+  <div class="week-card w1">
+    <div class="week-header">Week 1 — Build the Foundation</div>
+    <div class="week-body">
+      <ol>
+        <li><strong>Create new pipeline stages in HubSpot</strong> — MQL, Prospecting, Outreach, SQL (Gate), Discovery, Demo, Propose, Negotiation, Closing Soon, Won, Circle Back, Closed Lost</li>
+        <li><strong>Create mandatory properties per stage</strong> — Every stage gate requires specific fields to be filled before a deal can move forward</li>
+        <li><strong>Set up stage gates</strong> — SQL as qualification checkpoint with 4 criteria enforced</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="week-card w2">
+    <div class="week-header">Week 2 — Clean the Data</div>
+    <div class="week-body">
+      <ol start="4">
+        <li><strong>Triage existing 988 SQL deals:</strong>
+          <ul style="margin-top:6px">
+            <li><strong>634</strong> → Circle Back (have some value, not ready)</li>
+            <li><strong>227</strong> → Outreach (need enrichment + qualification)</li>
+            <li><strong>127</strong> → Closed Lost (dead, no signal)</li>
+          </ul>
+        </li>
+        <li><strong>Set up automation:</strong> stuck deal alerts, stage time limit warnings, missing property notifications</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="week-card w3">
+    <div class="week-header">Week 3 — Train & Ritualize</div>
+    <div class="week-body">
+      <ol start="6">
+        <li><strong>Train team on new pipeline + playbook</strong> — Walk through every stage, entry criteria, and decision tree with SDRs, AEs, and the full sales team</li>
+        <li><strong>Implement weekly pipeline review ritual:</strong>
+          <ul style="margin-top:6px">
+            <li>15 min daily standup (quick deal updates)</li>
+            <li>Weekly deep dive (bottleneck review, conversion analysis)</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="week-card w4">
+    <div class="week-header">Week 4 — Measure & Optimize</div>
+    <div class="week-body">
+      <ol start="8">
+        <li><strong>First bottleneck review</strong> — Identify the "odd number" in the funnel and focus the team on that one metric</li>
+        <li><strong>Set up dashboard with 3 North Stars</strong> — TOFU (pipeline created), MOFU (demos realized), BOFU (win rate by segment)</li>
+        <li><strong>Begin enrichment process with Clay/Apollo</strong> — SDR starts using enrichment tools for all new leads entering Prospecting</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Final CTA -->
+  <div class="metric-big" style="margin-top:30px">
+    <div style="font-size:1.2em;margin-bottom:8px">The pipeline is the machine.</div>
+    <div class="value" style="font-size:2em">Fix the machine, fix the revenue.</div>
+    <div class="desc" style="margin-top:12px">Q2 target: $2.4M — 60 deals — starts with Week 1.</div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer style="background:var(--navy);color:var(--white);padding:30px 0;text-align:center;font-size:.85em">
+  <div class="container">
+    <p style="opacity:.6">WTW Pipeline Master Document — Confidential — February 2026</p>
+    <p style="opacity:.4;margin-top:4px">Built for the WTW Sales Team</p>
+  </div>
+</footer>
+
+<!-- ============================================================ -->
+<!-- CHARTS (Chart.js) -->
+<!-- ============================================================ -->
+<script>
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=12;
+Chart.defaults.color="#6c757d";
+
+// 1. Current pipeline distribution
+new Chart(document.getElementById('currentPipeChart'),{
+  type:'bar',
+  data:{
+    labels:['SQL/Prospecting','Opportunity','Demo','Negotiation','Closing Soon','Won','Circle Back','Lost'],
+    datasets:[{
+      label:'Deals',
+      data:[923,89,45,32,18,67,198,119],
+      backgroundColor:['#dc3545','#6c757d','#1a1a2e','#1a1a2e','#1a1a2e','#28a745','#ffc107','#dc3545'],
+      borderRadius:6
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      title:{display:true,text:'Current Pipeline Distribution (1,491 deals)',font:{size:15,weight:'bold'},color:'#1a1a2e'},
+      legend:{display:false}
+    },
+    scales:{y:{beginAtZero:true,grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}
+  }
+});
+
+// 2. Conversion targets
+new Chart(document.getElementById('conversionChart'),{
+  type:'bar',
+  data:{
+    labels:['Prosp→Out','MQL→Out/SQL','Out→SQL','SQL→Disc','Disc→Demo','Demo→Prop','Prop→Neg','Neg→Won'],
+    datasets:[{
+      label:'Target %',
+      data:[70,70,20,90,70,60,50,60],
+      backgroundColor:['#3b82f6','#3b82f6','#3b82f6','#FF6B35','#1a1a2e','#1a1a2e','#1a1a2e','#28a745'],
+      borderRadius:6
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true,
+    plugins:{
+      title:{display:true,text:'Target Conversion Rates by Stage',font:{size:15,weight:'bold'},color:'#1a1a2e'},
+      legend:{display:false}
+    },
+    scales:{x:{beginAtZero:true,max:100,grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}}
+  }
+});
+
+// 3. Pipeline math comparison
+new Chart(document.getElementById('pipelineMathChart'),{
+  type:'bar',
+  data:{
+    labels:['MQLs Needed','Conversion Rate','Deals Won'],
+    datasets:[
+      {label:'Current',data:[4346,2.6,113],backgroundColor:'#dc354580',borderColor:'#dc3545',borderWidth:2,borderRadius:6},
+      {label:'Improved',data:[1800,6.3,113],backgroundColor:'#28a74580',borderColor:'#28a745',borderWidth:2,borderRadius:6}
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      title:{display:true,text:'Pipeline Math: Current vs Improved',font:{size:15,weight:'bold'},color:'#1a1a2e'}
+    },
+    scales:{y:{beginAtZero:true,grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}
+  }
+});
+
+// 4. Industry market growth
+new Chart(document.getElementById('industryChart'),{
+  type:'line',
+  data:{
+    labels:['2024','2025','2026','2027','2028','2029','2030','2031','2032','2033'],
+    datasets:[{
+      label:'Accessible Tourism Market ($B)',
+      data:[92.7,99.3,106.3,113.9,122.0,130.6,139.9,149.8,160.5,172.8],
+      borderColor:'#FF6B35',
+      backgroundColor:'rgba(255,107,53,.1)',
+      fill:true,
+      tension:.3,
+      pointBackgroundColor:'#FF6B35',
+      pointRadius:4,
+      borderWidth:3
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      title:{display:true,text:'Accessible Tourism Market Growth (7.1% CAGR)',font:{size:15,weight:'bold'},color:'#1a1a2e'}
+    },
+    scales:{
+      y:{beginAtZero:false,grid:{color:'#f0f0f0'},ticks:{callback:v=>'$'+v+'B'}},
+      x:{grid:{display:false}}
+    }
+  }
+});
+
+// Smooth scroll for nav
+document.querySelectorAll('nav a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// Active nav highlight on scroll
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('nav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id});
+  navLinks.forEach(l=>{l.classList.toggle('active',l.getAttribute('href')==='#'+cur)});
+});
+</script>
+</body>
+</html>

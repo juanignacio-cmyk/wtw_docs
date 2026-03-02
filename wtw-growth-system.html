@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growth System — Current State — WTW Growth Brain</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #d0d0d0; min-height: 100vh; }
+.nav { background: #0f0f18; padding: 0.8rem 2rem; border-bottom: 1px solid #1e1e2e; display: flex; align-items: center; gap: 1rem; }
+.nav a { color: #e94560; text-decoration: none; font-weight: 600; }
+.nav a:hover { color: #ff6b81; }
+.nav span { color: #4a4a5a; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: #fff; font-size: 2rem; margin: 1.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e94560; }
+h2 { color: #e94560; font-size: 1.4rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid #1e1e2e; }
+h3 { color: #8892b0; font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+p { line-height: 1.7; margin: 0.5rem 0; }
+ul { padding-left: 1.5rem; margin: 0.5rem 0; }
+li { line-height: 1.7; margin: 0.3rem 0; }
+strong { color: #fff; }
+em { color: #8892b0; }
+pre { background: #12121a; border: 1px solid #1e1e2e; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.9rem; margin: 1rem 0; }
+a { color: #e94560; }
+.footer { text-align: center; padding: 3rem 2rem 2rem; color: #4a4a5a; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="nav"><a href="index.html">🧠 Growth Brain</a> <span>›</span> <span>Growth System — Current State</span></div>
+<div class="container">
+<h1>WtW Growth System — Current State (Feb 24, 2026)</h1>
+<h2>Las 4 Palancas de Growth (objetivo: Sales B2B)</h2>
+<h3>1. DATA</h3>
+<p><strong>Tiene hoy:</strong></p>
+<ul>
+<li>LinkedIn (linkedin.com/in/juanignaciocontreras) — canal principal</li>
+<li>HubSpot B2B</li>
+<li>accessibilityverified.com — montado en Lovable, tiene Google Analytics</li>
+<li>SuperSet — dashboard de la compañía, más asociado a clientes</li>
+<li>Google Analytics (GA4) en accessibilityverified.com</li>
+</ul>
+<p><strong>Falta:</strong></p>
+<ul>
+<li>Google Tag Manager — NO implementado aún</li>
+<li>No puede atribuir contenido de LinkedIn a pipeline (top of funnel desconectado)</li>
+<li>Data decisions = &quot;estamos un poco a ciegas&quot;</li>
+<li>No hay nadie gestionando el pipeline ni el CRM activamente</li>
+</ul>
+<h3>2. CONTENT</h3>
+<p><strong>Produce hoy:</strong></p>
+<ul>
+<li>Nacho genera contenido vía LLM + Cloud (Claude, etc.)</li>
+<li>Documenta en Notion</li>
+<li>Estructura: pilares → tópicos → piezas de contenido</li>
+<li>Layer de contenido → Layer de comunicación (LinkedIn principal)</li>
+<li>Usa Gamma para diseño</li>
+<li>Tiene bastante buen contenido listo pero NO puede publicar newsletter aún (capacidad)</li>
+</ul>
+<p><strong>Quiere:</strong></p>
+<ul>
+<li>Employee-Led Growth: sistema donde empleados puedan compartir/amplificar contenido B2B</li>
+<li>Framework de narrativa de contenido para facilitar que otros lideren el relato</li>
+<li>Newsletter de Accessibility Verified (tiene contenido, falta ejecución)</li>
+</ul>
+<p><strong>Problema:</strong></p>
+<ul>
+<li>Un poco desordenado</li>
+<li>Solo Nacho produce, no escala</li>
+<li>No hay atribución de contenido → pipeline</li>
+</ul>
+<h3>3. EXPERIENCE</h3>
+<p><strong>Tiene hoy:</strong></p>
+<ul>
+<li>accessibilityverified.com (Lovable) — landing/front</li>
+<li>Post-venta: kickoff → partners portal (Huff) → onboarding</li>
+<li>Partners portal existe pero tiene &quot;muchas oportunidades de mejora&quot;</li>
+</ul>
+<p><strong>Problema:</strong></p>
+<ul>
+<li>Equipo de venta decía que &quot;no había un lugar donde pudieran mostrar la solución&quot; — por eso Nacho montó el sitio en Lovable</li>
+<li>Track de experiencia post-venta necesita mejora</li>
+</ul>
+<h3>4. EVENTS &amp; PARTNERSHIPS</h3>
+<p><strong>Tiene hoy:</strong></p>
+<ul>
+<li>Nacho maneja eventos (él + &quot;persona senior, ~50 años, muy tech pero con buen relacionamiento&quot;)</li>
+<li>Event playbook: cuánto van a ir, qué esperamos, presentación</li>
+<li>Este año hay estrategia de eventos (el año pasado no la había)</li>
+<li>Ejemplo: Marketing Summit Events</li>
+</ul>
+<p><strong>Quiere:</strong></p>
+<ul>
+<li>Maximizar ROI de cada evento</li>
+<li>Targetear bien: qué hacer en cada evento, con quién hablar, qué oportunidades</li>
+</ul>
+<h3>5. SALES B2B</h3>
+<p><strong>Equipo actual:</strong></p>
+<ul>
+<li>Andrés — NO es el equipo de sales (¿es ops/producto?)</li>
+<li>Arturo — vende principalmente (71 wins, top performer)</li>
+<li>Sagar — SDR</li>
+<li>Camilo — co-founder, también vende</li>
+<li>Sofi — ¿support?</li>
+</ul>
+<p><strong>Problema CRÍTICO:</strong></p>
+<ul>
+<li>NADIE gestiona el pipeline</li>
+<li>NADIE maneja el CRM</li>
+<li>NADIE está empujando/gestionando el pipeline</li>
+<li>Sales no tiene go-to-market strategy liderada</li>
+</ul>
+<p><strong>Nacho quiere:</strong></p>
+<ul>
+<li>Estructurar growth para poder EXIGIRLE al equipo de sales</li>
+<li>Liderar la estrategia go-to-market desde growth</li>
+<li>Gestionar el pipeline como growth (no como sales ops)</li>
+</ul>
+<h2>Nacho&#x27;s Role</h2>
+<ul>
+<li>Head of Growth → quiere liderar GTM strategy</li>
+<li>Hoy hace: contenido, eventos, website, data (todo)</li>
+<li>Equipo de content B2C reporta a él</li>
+<li>Necesita estructura para delegar y escalar</li>
+</ul>
+</div>
+<div class="footer">WTW Growth Brain — March 2026</div>
+</body>
+</html>

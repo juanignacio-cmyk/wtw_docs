@@ -1,1 +1,193 @@
-<html><head><meta http-equiv="refresh" content="0;url=pipeline-complete.html"></head></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WTW Growth Brain 🧠</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #e94560;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .header h1 span { color: #e94560; }
+        .header p {
+            color: #8892b0;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            color: #e94560;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .card:hover {
+            border-color: #e94560;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.15);
+        }
+        .card h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .card p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .card .tag {
+            display: inline-block;
+            background: #1a1a2e;
+            color: #e94560;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 0.75rem;
+            font-weight: 600;
+        }
+        .card .tag.green { color: #10b981; }
+        .card .tag.blue { color: #3b82f6; }
+        .card .tag.yellow { color: #f59e0b; }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #4a4a5a;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 640px) {
+            .header h1 { font-size: 1.8rem; }
+            .cards { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 WTW <span>Growth Brain</span></h1>
+        <p>Wheel the World — Growth systems, playbooks, and strategic docs. Built by Elena & Nacho.</p>
+    </div>
+    <div class="container">
+
+        <div class="section">
+            <div class="section-title">🔄 Pipeline & CRM</div>
+            <div class="cards">
+                <a class="card" href="pipeline-complete.html">
+                    <h3>Pipeline & CRM System — v3 FINAL</h3>
+                    <p>Complete CRM architecture: 3-layer system (Lifecycle + Lead Status + Deal Pipeline), stage definitions, properties, Gap Selling integration, workflows.</p>
+                    <span class="tag">FINAL</span>
+                </a>
+                <a class="card" href="hubspot-implementation.html">
+                    <h3>HubSpot Implementation Guide</h3>
+                    <p>Step-by-step HubSpot setup: custom properties, pipeline configuration, automation workflows, migration plan.</p>
+                    <span class="tag blue">IMPLEMENTATION</span>
+                </a>
+                <a class="card" href="pipeline-master.html">
+                    <h3>Pipeline Master — Full Reference</h3>
+                    <p>Deep-dive reference doc: all pipeline stages, gate criteria, buyer personas, A11Y maturity model, NSMs.</p>
+                    <span class="tag yellow">REFERENCE</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📚 Knowledge Base</div>
+            <div class="cards">
+                <a class="card" href="wtw-growth-strategy.html">
+                    <h3>Growth Strategy</h3>
+                    <p>WTW growth model: 4 levers (events, content, website, pipeline/sales), DMO focus, retention via Accessibility Verified Value.</p>
+                    <span class="tag green">STRATEGY</span>
+                </a>
+                <a class="card" href="wtw-product.html">
+                    <h3>Product — Accessibility Verified</h3>
+                    <p>Core product summary: what it is, how it works, value prop for DMOs, revenue model.</p>
+                    <span class="tag green">PRODUCT</span>
+                </a>
+                <a class="card" href="wtw-sales-foundations.html">
+                    <h3>Sales Foundations</h3>
+                    <p>Sales deck insights, buyer personas, objection handling, competitive positioning.</p>
+                    <span class="tag green">SALES</span>
+                </a>
+                <a class="card" href="wtw-growth-system.html">
+                    <h3>Growth System — Current State</h3>
+                    <p>Current state of 4 growth levers: what's working, what's broken, opportunities.</p>
+                    <span class="tag yellow">ANALYSIS</span>
+                </a>
+                <a class="card" href="wtw-context.html">
+                    <h3>Company Context</h3>
+                    <p>WTW overview: mission, market, team structure, key metrics.</p>
+                    <span class="tag blue">CONTEXT</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🔬 Research & Content</div>
+            <div class="cards">
+                <a class="card" href="google-travel-2050.html">
+                    <h3>Google Travel 2050 — Content Playbook</h3>
+                    <p>Content playbook based on Google's accessibility travel research and 2050 projections.</p>
+                    <span class="tag">CONTENT</span>
+                </a>
+                <a class="card" href="iata-accessibility-2025.html">
+                    <h3>IATA Accessibility 2025</h3>
+                    <p>IATA accessibility standards research and WTW positioning opportunities.</p>
+                    <span class="tag">RESEARCH</span>
+                </a>
+                <a class="card" href="wtw-industry-research.html">
+                    <h3>Industry Research</h3>
+                    <p>Market data, competitive landscape, industry trends in accessible tourism.</p>
+                    <span class="tag">RESEARCH</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <div class="footer">
+        WTW Growth Brain — Last updated March 2026<br>
+        Built with 🧠 by Elena × Nacho
+    </div>
+</body>
+</html>

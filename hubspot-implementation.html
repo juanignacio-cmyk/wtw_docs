@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WTW HubSpot Implementation Guide</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1a1a2e;--orange:#FF6B35;--light:#f8f9fa;--white:#fff;--gray:#6c757d;--red:#dc3545;--green:#28a745;--blue:#0d6efd;--yellow:#ffc107;--dark:#343a40;--teal:#0d9488;--purple:#7c3aed}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--light);color:#333;line-height:1.6}
+.container{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* Header */
+header{background:var(--navy);color:var(--white);padding:48px 0 40px;text-align:center}
+header h1{font-size:2.4em;letter-spacing:-1px}
+header h1 span{color:var(--orange)}
+header p{opacity:.8;margin-top:8px;font-size:1.1em}
+.subtitle{display:inline-block;background:var(--orange);color:var(--white);padding:4px 18px;border-radius:20px;font-size:.85em;margin-top:14px;font-weight:600}
+.header-meta{display:flex;gap:24px;justify-content:center;margin-top:20px;font-size:.82em;opacity:.65}
+
+/* Navigation */
+nav{background:var(--white);border-bottom:2px solid var(--orange);padding:12px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+nav .container{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+nav a{text-decoration:none;color:var(--navy);font-weight:600;font-size:.82em;padding:6px 14px;border-radius:6px;transition:.2s;white-space:nowrap}
+nav a:hover{background:var(--orange);color:var(--white)}
+
+/* Sections */
+section{padding:50px 0}
+.section-header{text-align:center;margin-bottom:40px}
+.section-header h2{color:var(--navy);font-size:2em;margin-bottom:8px}
+.section-header .part-label{display:inline-block;background:var(--orange);color:var(--white);padding:2px 14px;border-radius:12px;font-size:.75em;font-weight:700;margin-bottom:8px;letter-spacing:1px}
+.section-header p{color:var(--gray);font-size:1.05em}
+section:nth-child(even of section){background:var(--white)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:20px 0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+table{width:100%;border-collapse:collapse;font-size:.88em;background:var(--white)}
+thead{background:var(--navy);color:var(--white)}
+th{padding:12px 16px;text-align:left;font-weight:600;font-size:.82em;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:10px 16px;border-bottom:1px solid #f0f0f0}
+tr:hover td{background:#f8f9fa}
+.copy-name{font-family:'Courier New',monospace;background:#e8eaff;color:var(--navy);padding:2px 8px;border-radius:4px;font-size:.88em;font-weight:600;cursor:pointer;user-select:all}
+.copy-name:hover{background:var(--orange);color:var(--white)}
+
+/* Status badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-orange{background:#fff7ed;color:#c2410c}
+.badge-gray{background:#f3f4f6;color:#374151}
+.badge-purple{background:#f3e8ff;color:#6b21a8}
+
+/* Cards */
+.card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px;border-left:4px solid var(--orange)}
+.card h3{color:var(--navy);margin-bottom:12px;font-size:1.15em}
+.card.green{border-left-color:var(--green)}
+.card.blue{border-left-color:var(--blue)}
+.card.red{border-left-color:var(--red)}
+.card.navy{border-left-color:var(--navy)}
+.card.purple{border-left-color:var(--purple)}
+.card.teal{border-left-color:var(--teal)}
+
+/* Stage gate cards */
+.gate-card{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 3px 16px rgba(0,0,0,.07);margin-bottom:24px}
+.gate-header{padding:14px 24px;color:var(--white);display:flex;justify-content:space-between;align-items:center}
+.gate-header h3{font-size:1.05em}
+.gate-header .stage-num{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-size:.78em;font-weight:700}
+.gate-body{padding:20px 24px}
+.gate-body .checklist{list-style:none;padding:0}
+.gate-body .checklist li{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:.9em;display:flex;align-items:center;gap:8px}
+.gate-body .checklist li:last-child{border:0}
+.gate-body .checklist li::before{content:'';width:18px;height:18px;border:2px solid var(--orange);border-radius:4px;flex-shrink:0;display:inline-block}
+.gate-body .checklist li.critical::before{background:var(--orange);border-color:var(--orange);box-shadow:inset 0 0 0 2px #fff}
+
+/* Workflow cards */
+.wf-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;border-left:4px solid var(--navy)}
+.wf-card h4{color:var(--navy);font-size:.95em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.wf-card .wf-num{background:var(--navy);color:var(--white);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72em;flex-shrink:0}
+.wf-card .wf-logic{background:#f8f9fa;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:.82em;line-height:1.7;margin-top:8px}
+.wf-card .wf-logic .kw{color:var(--orange);font-weight:700}
+.wf-card .wf-logic .val{color:var(--blue)}
+.wf-card .wf-meta{display:flex;gap:12px;margin-top:10px;font-size:.8em;flex-wrap:wrap}
+.wf-group{margin-bottom:32px}
+.wf-group-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--navy)}
+.wf-group-header h3{color:var(--navy);font-size:1.1em}
+.wf-group-header .wf-group-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.82em}
+
+/* Pipeline flow */
+.pipeline-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:30px 0;padding:20px 0}
+.flow-node{color:var(--white);padding:10px 16px;border-radius:10px;text-align:center;font-size:.78em;font-weight:600;min-width:90px;position:relative}
+.flow-node small{display:block;font-weight:400;opacity:.85;font-size:.82em}
+.flow-arrow{color:var(--orange);font-size:1.4em;font-weight:700;padding:0 2px;flex-shrink:0}
+
+/* Migration phases */
+.phase-card{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 3px 16px rgba(0,0,0,.07);margin-bottom:24px}
+.phase-header{padding:14px 24px;color:var(--white);font-weight:700;font-size:1.05em;display:flex;justify-content:space-between;align-items:center}
+.phase-body{padding:20px 24px}
+.phase-body ol,.phase-body ul{padding-left:20px}
+.phase-body li{padding:6px 0;font-size:.92em}
+
+/* Bucket grid */
+.bucket-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:16px 0}
+.bucket{border-radius:10px;padding:16px;text-align:center;color:var(--white);font-weight:700}
+.bucket .count{font-size:2em;line-height:1}
+.bucket .label{font-size:.78em;opacity:.85;margin-top:4px}
+
+/* Timeline */
+.timeline{display:flex;gap:0;margin:20px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.tl-block{flex:1;padding:16px 12px;text-align:center;color:#fff;font-weight:700;min-height:80px;display:flex;flex-direction:column;justify-content:center}
+.tl-block .tl-week{font-size:.7em;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.tl-block .tl-name{font-size:.88em;margin-top:4px}
+.tl-block .tl-detail{font-size:.7em;opacity:.8;margin-top:2px;font-weight:400}
+
+/* Metrics comparison */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:20px 0}
+.metric-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.metric-card h4{color:var(--navy);font-size:.9em;margin-bottom:12px}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:.88em}
+.metric-row:last-child{border:0}
+.metric-current{color:var(--red);font-weight:700}
+.metric-target{color:var(--green);font-weight:700}
+.metric-arrow{color:var(--orange);font-weight:700}
+
+/* Risk cards */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:20px 0}
+.risk-card{background:var(--white);border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.risk-card h4{font-size:.88em;color:var(--navy);margin-bottom:6px}
+.risk-card p{font-size:.82em;color:var(--gray)}
+
+/* Section Intro */
+.section-intro{max-width:720px;margin:0 auto 32px;text-align:center;font-size:.95em;color:var(--gray);line-height:1.7}
+
+/* Copy toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--white);padding:10px 24px;border-radius:8px;font-size:.88em;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+/* Utility */
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.mb-12{margin-bottom:12px}
+.text-center{text-align:center}
+.text-sm{font-size:.85em}
+.text-xs{font-size:.78em;color:var(--gray)}
+.fw-700{font-weight:700}
+.color-navy{color:var(--navy)}
+.color-orange{color:var(--orange)}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+
+/* Print */
+@media print{
+  nav{display:none}
+  section{padding:20px 0;page-break-inside:avoid}
+  .gate-card,.phase-card,.wf-card{break-inside:avoid}
+}
+
+/* Responsive */
+@media(max-width:768px){
+  header h1{font-size:1.6em}
+  .section-header h2{font-size:1.5em}
+  nav a{font-size:.72em;padding:4px 8px}
+  .pipeline-flow{flex-direction:column;gap:0}
+  .flow-arrow{transform:rotate(90deg)}
+  .bucket-grid{grid-template-columns:1fr 1fr}
+  .timeline{flex-direction:column}
+  .header-meta{flex-direction:column;gap:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- Toast for copy -->
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <h1>HubSpot <span>Implementation Guide</span></h1>
+    <p>Wheel the World — Pipeline v2 Technical Setup</p>
+    <div class="subtitle">Step-by-Step Configuration Manual</div>
+    <div class="header-meta">
+      <span>Based on 1,491-deal analysis</span>
+      <span>|</span>
+      <span>10 Pipeline Stages</span>
+      <span>|</span>
+      <span>16 New Properties</span>
+      <span>|</span>
+      <span>17 Automation Rules</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#pipeline">Pipeline Stages</a>
+    <a href="#properties">Properties Audit</a>
+    <a href="#gates">Stage Gates</a>
+    <a href="#workflows">Workflows</a>
+    <a href="#migration">Migration Plan</a>
+    <a href="#metrics">Success Metrics</a>
+  </div>
+</nav>
+
+<!-- ============================= -->
+<!-- SECTION 1: PIPELINE CONFIG    -->
+<!-- ============================= -->
+<section id="pipeline">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 1</div>
+      <h2>Pipeline Configuration</h2>
+      <p>Exact stages to create in HubSpot — in order, with probabilities</p>
+    </div>
+
+    <p class="section-intro">Create these stages in <strong>Settings → Objects → Deals → Pipelines</strong>. Delete or archive old stages after the 30-day parallel run. The probability % auto-calculates weighted pipeline value.</p>
+
+    <!-- Visual flow -->
+    <div class="pipeline-flow">
+      <div class="flow-node" style="background:var(--blue)">MQL<small>0%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--blue)">Prospecting<small>5%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--teal)">Outreach<small>10%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--orange)">SQL<small>20%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--orange)">Demo<small>40%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--purple)">Negotiation<small>60%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--navy)">Closing Soon<small>80%</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="background:var(--green)">Won<small>100%</small></div>
+    </div>
+    <div class="text-center text-xs mb-12" style="margin-top:-10px">
+      + <span class="badge badge-red">Closed Lost (0%)</span> &nbsp;
+      <span class="badge badge-yellow">Circle Back Later (5%)</span>
+    </div>
+
+    <!-- Stage table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Stage Name (HubSpot)</th>
+            <th>Internal ID</th>
+            <th>Probability</th>
+            <th>Max Days</th>
+            <th>Zone</th>
+            <th>Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>0</strong></td>
+            <td><strong>MQL</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">mql</span></td>
+            <td>0%</td>
+            <td>2 days</td>
+            <td><span class="badge badge-blue">Pre-Pipeline</span></td>
+            <td>Marketing / Events</td>
+          </tr>
+          <tr>
+            <td><strong>1</strong></td>
+            <td><strong>Prospecting</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">prospecting</span></td>
+            <td>5%</td>
+            <td>7 days</td>
+            <td><span class="badge badge-blue">Pre-Pipeline</span></td>
+            <td>SDR</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td><strong>Outreach</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">outreach</span></td>
+            <td>10%</td>
+            <td>21 days</td>
+            <td><span class="badge badge-blue">Pre-Pipeline</span></td>
+            <td>SDR</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td><strong>SQL</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">sql</span></td>
+            <td>20%</td>
+            <td>14 days</td>
+            <td><span class="badge badge-orange">Sales Pipeline</span></td>
+            <td>SDR → Sales</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td><strong>Demo</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">demo</span></td>
+            <td>40%</td>
+            <td>14 days</td>
+            <td><span class="badge badge-orange">Sales Pipeline</span></td>
+            <td>Sales</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td><strong>Negotiation</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">negotiation</span></td>
+            <td>60%</td>
+            <td>45 days</td>
+            <td><span class="badge badge-orange">Sales Pipeline</span></td>
+            <td>Sales</td>
+          </tr>
+          <tr>
+            <td><strong>6</strong></td>
+            <td><strong>Closing Soon</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closing_soon</span></td>
+            <td>80%</td>
+            <td>14 days</td>
+            <td><span class="badge badge-orange">Sales Pipeline</span></td>
+            <td>Sales</td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><strong>7</strong></td>
+            <td><strong>Deal Closed Won</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closedwon</span></td>
+            <td>100%</td>
+            <td>—</td>
+            <td><span class="badge badge-green">Closed</span></td>
+            <td>Sales → CS</td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>8</strong></td>
+            <td><strong>Closed Lost</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closedlost</span></td>
+            <td>0%</td>
+            <td>—</td>
+            <td><span class="badge badge-red">Closed</span></td>
+            <td>Sales</td>
+          </tr>
+          <tr style="background:#fffbeb">
+            <td><strong>9</strong></td>
+            <td><strong>Circle Back Later</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">circle_back</span></td>
+            <td>5%</td>
+            <td>90 days max</td>
+            <td><span class="badge badge-yellow">Nurture</span></td>
+            <td>Sales</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs mt-16">Click any <span class="copy-name" style="font-size:1em">internal_id</span> to copy. Stage order matters — HubSpot reads top-to-bottom for pipeline board layout.</p>
+
+    <div class="card blue mt-24">
+      <h3>Setup Instructions</h3>
+      <ol style="padding-left:20px;font-size:.9em">
+        <li><strong>Settings → Objects → Deals → Pipelines</strong> → Edit existing "AV New Business" pipeline</li>
+        <li>Add missing stages in exact order above (MQL, Prospecting, Outreach are NEW)</li>
+        <li>Set probability % for each stage as listed</li>
+        <li>Keep old stages temporarily — they'll be archived after the 30-day parallel run</li>
+        <li>Set "Won" and "Lost" as the terminal stages under pipeline settings</li>
+        <li>Configure "Circle Back Later" as an open (non-terminal) stage</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 2: PROPERTIES AUDIT   -->
+<!-- ============================= -->
+<section id="properties">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 2</div>
+      <h2>Properties Audit</h2>
+      <p>Every property to keep, create, fix, or delete — with exact HubSpot field types</p>
+    </div>
+
+    <p class="section-intro">
+      <span class="badge badge-green">GREEN = Keep</span> &nbsp;
+      <span class="badge badge-yellow">YELLOW = Fix/Standardize</span> &nbsp;
+      <span class="badge badge-blue">BLUE = Create New</span> &nbsp;
+      <span class="badge badge-red">RED = Delete/Archive</span>
+    </p>
+
+    <!-- EXISTING - KEEP / FIX -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.2em">Existing Properties — Keep &amp; Standardize</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Property Name</th>
+            <th>HubSpot Internal Name</th>
+            <th>Current Type</th>
+            <th>Action Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Closed Lost Reason</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closed_lost_reason</span></td>
+            <td>Free text</td>
+            <td>Change to <strong>Dropdown</strong>: No Budget / No Response-Ghosted / Chose Competitor / Not Interested / Bad Timing / Not a Fit / Champion Left / Internal Restructuring / Other</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>B2B Source</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">b2b_source</span></td>
+            <td>Dropdown</td>
+            <td>Standardize options to: Outbound / Inbound / Referral / Trade Show (TravelAbility) / Trade Show (DI) / Trade Show (IPW) / Trade Show (Connect) / Trade Show (Other) / Other</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Event Source</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">event_source</span></td>
+            <td>Dropdown</td>
+            <td>Keep — make dependent on B2B Source = any "Trade Show" value</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Champion Type</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">champion_type</span></td>
+            <td>Dropdown</td>
+            <td>Keep options (Strong / Weak / Not a Champion) — make <strong>required at SQL stage</strong></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Deal Type B2B</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">deal_type_b2b</span></td>
+            <td>Dropdown</td>
+            <td>Add "DV+MS" as explicit option. Full list: DV / MS / DV+MS / Airports / Hotels / Other</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Country</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">country</span></td>
+            <td>Text/Dropdown</td>
+            <td>Make <strong>required at SQL</strong>. Currently 91% empty on won deals.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">FIX</span></td>
+            <td><strong>Deal Name</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">dealname</span></td>
+            <td>Text</td>
+            <td>Enforce naming format: <code>"Company - Product - Year"</code></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Deal Owner</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">hubspot_owner_id</span></td>
+            <td>Owner</td>
+            <td>No changes</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Amount</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">amount</span></td>
+            <td>Currency</td>
+            <td>No changes — make required at Negotiation</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Close Date</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closedate</span></td>
+            <td>Date</td>
+            <td>No changes — make required at Negotiation</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Number of Listings/Maps</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">number_of_listings</span></td>
+            <td>Number</td>
+            <td>No changes</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Contact Email</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">email</span></td>
+            <td>Text</td>
+            <td>No changes</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">KEEP</span></td>
+            <td><strong>Company Name</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">company</span></td>
+            <td>Text</td>
+            <td>No changes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NEW PROPERTIES TO CREATE -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.2em">New Deal Properties to Create</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>HubSpot Internal Name</th>
+            <th>Type</th>
+            <th>Options</th>
+            <th>Required At</th>
+            <th>Group</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#eff6ff">
+            <td><strong>ICP Tier</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">icp_tier</span></td>
+            <td>Dropdown</td>
+            <td>Tier 1 / Tier 2 / Tier 3</td>
+            <td><span class="badge badge-blue">Prospecting</span></td>
+            <td>Qualification</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>SQL Checklist — Right Person</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">sql_check_right_person</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-orange">SQL</span></td>
+            <td>SQL Qualification</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>SQL Checklist — Budget Exists</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">sql_check_budget_exists</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-orange">SQL</span></td>
+            <td>SQL Qualification</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>SQL Checklist — Timing</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">sql_check_timing</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-orange">SQL</span></td>
+            <td>SQL Qualification</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>SQL Checklist — Interest</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">sql_check_interest</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-orange">SQL</span></td>
+            <td>SQL Qualification</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Demo Date</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">demo_date</span></td>
+            <td>Date picker</td>
+            <td>—</td>
+            <td><span class="badge badge-orange">Demo</span></td>
+            <td>Demo</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Decision Maker Present</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">decision_maker_present</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-orange">Demo</span></td>
+            <td>Demo</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Forecast Category</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">forecast_category</span></td>
+            <td>Dropdown</td>
+            <td>Commit / Best Case / Pipeline</td>
+            <td><span class="badge badge-purple">Negotiation</span></td>
+            <td>Forecast</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Contract Sent Date</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">contract_sent_date</span></td>
+            <td>Date picker</td>
+            <td>—</td>
+            <td><span class="badge badge-gray">Closing Soon</span></td>
+            <td>Closing</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Expected Payment Date</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">expected_payment_date</span></td>
+            <td>Date picker</td>
+            <td>—</td>
+            <td><span class="badge badge-gray">Closing Soon</span></td>
+            <td>Closing</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Closed Won Reason</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closed_won_reason</span></td>
+            <td>Dropdown</td>
+            <td>Product Fit / Price / Relationship / Grant Funding / Event Follow-up / Other</td>
+            <td><span class="badge badge-green">Won</span></td>
+            <td>Closed</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Reopen Eligible</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">reopen_eligible</span></td>
+            <td>Checkbox (Yes/No)</td>
+            <td>Yes / No</td>
+            <td><span class="badge badge-red">Lost</span></td>
+            <td>Closed</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Closed Lost Detail</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">closed_lost_detail</span></td>
+            <td>Single-line text</td>
+            <td>—</td>
+            <td><span class="badge badge-gray">Lost (optional)</span></td>
+            <td>Closed</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Circle Back Reason</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">circle_back_reason</span></td>
+            <td>Dropdown</td>
+            <td>Budget Next Year / Timing / Need Internal Approval / Seasonal / Other</td>
+            <td><span class="badge badge-yellow">Circle Back</span></td>
+            <td>Circle Back</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Circle Back Date</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">circle_back_date</span></td>
+            <td>Date picker</td>
+            <td>—</td>
+            <td><span class="badge badge-yellow">Circle Back</span></td>
+            <td>Circle Back</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Circle Back Count</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">circle_back_count</span></td>
+            <td>Number</td>
+            <td>0 / 1 / 2 (auto-increment)</td>
+            <td><span class="badge badge-gray">Auto</span></td>
+            <td>Circle Back</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Last Stage Before Circle Back</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">last_stage_before_cb</span></td>
+            <td>Dropdown</td>
+            <td>(All pipeline stage names)</td>
+            <td><span class="badge badge-gray">Auto</span></td>
+            <td>Circle Back</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NEW CONTACT PROPERTIES -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.2em">New Contact Properties to Create</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>HubSpot Internal Name</th>
+            <th>Type</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#eff6ff">
+            <td><strong>Buyer Persona</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">buyer_persona</span></td>
+            <td>Dropdown</td>
+            <td>Tourism Director / Marketing VP / A11Y Lead / CEO / Operations Director / Grant Manager / Other</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>Contact Role</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">contact_role</span></td>
+            <td>Dropdown</td>
+            <td>Decision Maker / Champion / Influencer / Budget Holder / End User / Blocker</td>
+          </tr>
+          <tr style="background:#eff6ff">
+            <td><strong>ICP Tier (Company)</strong></td>
+            <td><span class="copy-name" onclick="copyText(this)">icp_tier_company</span></td>
+            <td>Dropdown</td>
+            <td>Tier 1 / Tier 2 / Tier 3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PROPERTIES TO DELETE -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.2em">Properties to Delete / Archive</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Reason</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fef2f2">
+            <td><span class="copy-name" onclick="copyText(this)">close_date_zapier</span></td>
+            <td>Duplicate of native close date</td>
+            <td><span class="badge badge-red">DELETE</span></td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>SQL (old) stage references</strong></td>
+            <td>Old pipeline stage — replaced by v2 stages</td>
+            <td><span class="badge badge-red">ARCHIVE</span></td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>Circle Back (old) stage references</strong></td>
+            <td>Old pipeline stage — replaced by v2 stages</td>
+            <td><span class="badge badge-red">ARCHIVE</span></td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>Properties with 0% fill rate</strong></td>
+            <td>Run audit: any property with 0 values across all 1,491 deals</td>
+            <td><span class="badge badge-red">ARCHIVE</span></td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>Duplicate time-tracking properties</strong></td>
+            <td>"Cumulative time" / "Date entered" / "Latest time" for deleted pipelines</td>
+            <td><span class="badge badge-red">ARCHIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card red mt-16">
+      <h3>Before Deleting</h3>
+      <p style="font-size:.9em">Export a full backup of all 1,491 deals before archiving any property. HubSpot's "Archive" is safer than "Delete" — archived properties retain data but are hidden from views. Delete only after confirming zero dependencies in reports, workflows, or integrations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 3: STAGE GATES        -->
+<!-- ============================= -->
+<section id="gates">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 3</div>
+      <h2>Stage Gates — Required Properties</h2>
+      <p>What MUST be filled before a deal can enter each stage</p>
+    </div>
+
+    <p class="section-intro">Configure these as <strong>required properties per stage</strong> in HubSpot under Pipeline Settings. Properties marked with a filled checkbox are <strong>hard gates</strong> — workflows will block stage entry without them.</p>
+
+    <!-- Stage 0: MQL -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--blue)">
+        <h3>Stage 0 — MQL</h3>
+        <span class="stage-num">INBOUND ONLY</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">Contact Email</li>
+          <li class="critical">Company Name</li>
+          <li class="critical">Lead Source = "Inbound"</li>
+          <li>Lead Source Detail (which form/page)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>SLA:</strong> 24hr first response, 48hr to move or disqualify</p>
+      </div>
+    </div>
+
+    <!-- Stage 1: Prospecting -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--blue)">
+        <h3>Stage 1 — Prospecting</h3>
+        <span class="stage-num">OUTBOUND</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">Deal Name (format: "Company - DV/MS - Year")</li>
+          <li class="critical">B2B Source (dropdown)</li>
+          <li class="critical">ICP Tier (Tier 1 / 2 / 3)</li>
+          <li class="critical">Deal Owner</li>
+          <li>Event Source (if B2B Source = Trade Show)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>SLA:</strong> First touch within 5 business days</p>
+      </div>
+    </div>
+
+    <!-- Stage 2: Outreach -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--teal)">
+        <h3>Stage 2 — Outreach</h3>
+        <span class="stage-num">ENGAGEMENT</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from Prospecting</li>
+          <li class="critical">Contact Role (dropdown) on primary contact</li>
+          <li class="critical">Next Step (text)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>SLA:</strong> 3-6 touches over 14 days. Max 21 days — auto-move to Circle Back if no response.</p>
+      </div>
+    </div>
+
+    <!-- Stage 3: SQL -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--orange)">
+        <h3>Stage 3 — SQL (Sales Qualified Lead)</h3>
+        <span class="stage-num">QUALIFICATION GATE</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from Outreach</li>
+          <li class="critical">SQL Checklist — Right Person = YES</li>
+          <li class="critical">SQL Checklist — Budget Exists = YES</li>
+          <li class="critical">SQL Checklist — Timing = YES</li>
+          <li class="critical">SQL Checklist — Interest = YES</li>
+          <li class="critical">Champion Type (Strong / Weak / Not a Champion)</li>
+          <li class="critical">Buyer Persona (dropdown)</li>
+          <li class="critical">Country</li>
+          <li class="critical">Deal Type B2B (DV / MS / DV+MS / Airports / Hotels / Other)</li>
+          <li class="critical">Estimated Deal Amount</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>HARD GATE:</strong> Cannot enter SQL without ALL 4 checklist items = Yes. <strong>SLA:</strong> Demo booked within 14 days.</p>
+      </div>
+    </div>
+
+    <!-- Stage 4: Demo -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--orange)">
+        <h3>Stage 4 — Demo</h3>
+        <span class="stage-num">PRESENTATION</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from SQL</li>
+          <li class="critical">Demo Date</li>
+          <li>Number of Attendees</li>
+          <li>Decision Maker Present? (yes/no)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>SLA:</strong> Quote sent within 3 business days post-demo</p>
+      </div>
+    </div>
+
+    <!-- Stage 5: Negotiation -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--purple)">
+        <h3>Stage 5 — Negotiation</h3>
+        <span class="stage-num">PROPOSAL</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from Demo</li>
+          <li class="critical">Amount (required, no $0)</li>
+          <li class="critical">Close Date (required)</li>
+          <li class="critical">Number of Listings/Maps</li>
+          <li class="critical">Forecast Category (Commit / Best Case / Pipeline)</li>
+          <li>Deal Probability (%)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>HARD GATE:</strong> Cannot enter without Amount + Close Date. <strong>SLA:</strong> Max 30 days, weekly check-in.</p>
+      </div>
+    </div>
+
+    <!-- Stage 6: Closing Soon -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--navy)">
+        <h3>Stage 6 — Closing Soon</h3>
+        <span class="stage-num">CONTRACT</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from Negotiation</li>
+          <li class="critical">Contract Sent Date</li>
+          <li class="critical">Expected Payment Date</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>SLA:</strong> Max 14 days. Slack alerts at day 7 and 10. Daily alerts after day 14.</p>
+      </div>
+    </div>
+
+    <!-- Stage 7: Won -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--green)">
+        <h3>Stage 7 — Deal Closed Won</h3>
+        <span class="stage-num">CELEBRATION</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">All from Closing Soon</li>
+          <li class="critical">Closed Won Reason (dropdown)</li>
+          <li class="critical">Annual Contract Value</li>
+          <li class="critical">Number of Listings/Maps (final)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>Auto-triggers:</strong> Contact lifecycle → Customer, CS handoff workflow, renewal deal creation.</p>
+      </div>
+    </div>
+
+    <!-- Stage 8: Lost -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:var(--red)">
+        <h3>Stage 8 — Closed Lost</h3>
+        <span class="stage-num">REQUIRED REASON</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">Closed Lost Reason (REQUIRED dropdown)</li>
+          <li>Closed Lost Detail (optional text)</li>
+          <li>Reopen Eligible? (yes/no)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>HARD GATE:</strong> Cannot close lost without selecting a reason. If Reopen Eligible = yes, auto-creates follow-up task in 90 days.</p>
+      </div>
+    </div>
+
+    <!-- Stage 9: Circle Back -->
+    <div class="gate-card">
+      <div class="gate-header" style="background:#b45309">
+        <h3>Stage 9 — Circle Back Later</h3>
+        <span class="stage-num">NURTURE</span>
+      </div>
+      <div class="gate-body">
+        <ul class="checklist">
+          <li class="critical">Circle Back Reason (dropdown)</li>
+          <li class="critical">Circle Back Date (when to re-engage)</li>
+          <li>Last Stage Before Circle Back (auto-set)</li>
+        </ul>
+        <p class="text-xs mt-16"><strong>RULES:</strong> Auto-task on Circle Back Date. If date passes + 30 days no activity → auto-Lost. Max 2 circle-backs per deal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 4: WORKFLOWS          -->
+<!-- ============================= -->
+<section id="workflows">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 4</div>
+      <h2>Workflows to Build</h2>
+      <p>17 automation rules — exact trigger/action logic for HubSpot Workflows</p>
+    </div>
+
+    <p class="section-intro">Build these in <strong>Automation → Workflows → Deal-based</strong>. Each rule includes the exact IF/THEN logic. Workflows are grouped by function.</p>
+
+    <!-- GROUP 1: STAGE GUARDS -->
+    <div class="wf-group">
+      <div class="wf-group-header">
+        <div class="wf-group-icon" style="background:var(--orange)">SG</div>
+        <h3>Stage Guards — Block Invalid Transitions</h3>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--orange)">
+        <h4><span class="wf-num">1</span> SQL Entry Gate</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage moves <span class="val">→ SQL</span>
+<span class="kw">IF:</span> sql_check_right_person != Yes
+   <span class="kw">OR</span> sql_check_budget_exists != Yes
+   <span class="kw">OR</span> sql_check_timing != Yes
+   <span class="kw">OR</span> sql_check_interest != Yes
+<span class="kw">THEN:</span> Revert deal to previous stage
+      Send internal notification to deal owner:
+      "Deal [deal name] missing SQL qualification. Complete all 4 checklist items."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-orange">Critical</span>
+          <span class="badge badge-gray">Deal-based workflow</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--orange)">
+        <h4><span class="wf-num">2</span> Negotiation Entry Gate</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage moves <span class="val">→ Negotiation</span>
+<span class="kw">IF:</span> amount = 0 <span class="kw">OR</span> amount is empty
+   <span class="kw">OR</span> closedate is empty
+<span class="kw">THEN:</span> Revert deal to previous stage
+      Send notification: "Cannot enter Negotiation without Amount and Close Date."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-orange">Critical</span>
+          <span class="badge badge-gray">Deal-based workflow</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--orange)">
+        <h4><span class="wf-num">3</span> Closed Lost Reason Gate</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage moves <span class="val">→ Closed Lost</span>
+<span class="kw">IF:</span> closed_lost_reason is empty
+<span class="kw">THEN:</span> Revert deal to previous stage
+      Send notification: "Must select a Closed Lost Reason before closing."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-orange">Critical</span>
+          <span class="badge badge-gray">Deal-based workflow</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--orange)">
+        <h4><span class="wf-num">4</span> Circle Back Date Gate</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage moves <span class="val">→ Circle Back Later</span>
+<span class="kw">IF:</span> circle_back_date is empty
+<span class="kw">THEN:</span> Revert deal to previous stage
+      Send notification: "Set a Circle Back Date before moving to Circle Back."
+<span class="kw">ALSO:</span> Increment circle_back_count by 1
+      Set last_stage_before_cb to previous stage value
+<span class="kw">IF:</span> circle_back_count > 2
+<span class="kw">THEN:</span> Send alert: "Max 2 circle-backs reached. Force to Won or Lost."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-orange">Critical</span>
+          <span class="badge badge-gray">Deal-based workflow</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP 2: TIME-BASED ALERTS -->
+    <div class="wf-group">
+      <div class="wf-group-header">
+        <div class="wf-group-icon" style="background:var(--blue)">TA</div>
+        <h3>Time-Based Alerts — SLA Enforcement</h3>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">5</span> MQL — 24hr Stale Alert</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">MQL</span>
+<span class="kw">AND:</span> Last activity date > 24 hours ago
+<span class="kw">THEN:</span> Send email notification to deal owner
+      Subject: "MQL Stale: [deal name] — no activity in 24hrs"
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-gray">Delay: 24hrs after stage entry</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">6</span> Prospecting — 7-Day Stale Alert</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">Prospecting</span>
+<span class="kw">AND:</span> Last activity date > 7 days ago
+<span class="kw">THEN:</span> Send notification to deal owner
+      "Prospecting deal [deal name] has no activity in 7 days."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-gray">Delay: 7 days after stage entry</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">7</span> Outreach — 14-Day Warning + 21-Day Auto-Move</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">Outreach</span>
+
+<span class="kw">BRANCH 1 — Day 14:</span>
+<span class="kw">IF:</span> No meeting booked after 14 days
+<span class="kw">THEN:</span> Alert owner: "No meeting booked. 7 days remaining."
+
+<span class="kw">BRANCH 2 — Day 21:</span>
+<span class="kw">IF:</span> Still no response after 21 days + 6 logged activities
+<span class="kw">THEN:</span> Auto-move deal to <span class="val">Circle Back Later</span>
+      Set circle_back_reason = "No Response"
+      Set circle_back_date = today + 90 days
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-yellow">Auto-move</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">8</span> SQL — 7-Day Alert + 30-Day Auto-Circle Back</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">SQL</span>
+
+<span class="kw">BRANCH 1 — Day 7:</span>
+<span class="kw">IF:</span> No demo booked (demo_date is empty)
+<span class="kw">THEN:</span> Alert: "SQL deal [name] — 7 days, no demo scheduled."
+
+<span class="kw">BRANCH 2 — Day 30:</span>
+<span class="kw">IF:</span> No progress (no stage change, no demo_date)
+<span class="kw">THEN:</span> Auto-move to <span class="val">Circle Back Later</span>
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-yellow">Auto-move</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">9</span> Negotiation — Weekly Monday Alert + 45-Day Auto-Move</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">Negotiation</span>
+
+<span class="kw">RECURRING — Every Monday:</span>
+<span class="kw">IF:</span> Last activity > 7 days ago
+<span class="kw">THEN:</span> Alert owner: "Negotiation deal [name] — no activity this week."
+
+<span class="kw">BRANCH — Day 45:</span>
+<span class="kw">IF:</span> 45 days in Negotiation with no stage change
+<span class="kw">THEN:</span> Auto-move to <span class="val">Circle Back Later</span>
+
+<span class="kw">BRANCH — Close Date Passed:</span>
+<span class="kw">IF:</span> closedate < today
+<span class="kw">THEN:</span> Alert: "Close date passed — update required."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-yellow">Auto-move</span>
+          <span class="badge badge-red">Close date watch</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">10</span> Closing Soon — Escalating Alerts</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">Closing Soon</span>
+
+<span class="kw">Day 7:</span>  Alert owner via Slack + email
+<span class="kw">Day 10:</span> Alert owner + manager via Slack + email
+<span class="kw">Day 14+:</span> Daily alert to owner + manager
+      "Contract unsigned for [X] days. Escalate."
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-red">Escalation</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--blue)">
+        <h4><span class="wf-num">11</span> Circle Back — Re-engage + Auto-Lost</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal is in stage <span class="val">Circle Back Later</span>
+
+<span class="kw">BRANCH 1 — Circle Back Date arrives:</span>
+<span class="kw">THEN:</span> Create task for deal owner: "Re-engage [deal name]"
+      Send notification reminder
+
+<span class="kw">BRANCH 2 — Circle Back Date + 30 days:</span>
+<span class="kw">IF:</span> No activity since Circle Back Date
+<span class="kw">THEN:</span> Auto-move to <span class="val">Closed Lost</span>
+      Set closed_lost_reason = "No Response - Ghosted"
+
+<span class="kw">QUARTERLY:</span> Report of all Circle Back deals for review
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-blue">SLA</span>
+          <span class="badge badge-yellow">Auto-move</span>
+          <span class="badge badge-purple">Quarterly review</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP 3: LIFECYCLE SYNCS -->
+    <div class="wf-group">
+      <div class="wf-group-header">
+        <div class="wf-group-icon" style="background:var(--green)">LC</div>
+        <h3>Lifecycle Syncs — Contact Status Updates</h3>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--green)">
+        <h4><span class="wf-num">12</span> Deal → SQL: Contact Lifecycle = SQL</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage changes to <span class="val">SQL</span>
+<span class="kw">THEN:</span> Update associated contact lifecycle_stage = "Sales Qualified Lead"
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-green">Lifecycle</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--green)">
+        <h4><span class="wf-num">13</span> Deal → Won: Contact Lifecycle = Customer</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage changes to <span class="val">Deal Closed Won</span>
+<span class="kw">THEN:</span> Update associated contact lifecycle_stage = "Customer"
+      Trigger CS handoff workflow
+      Create renewal deal in "AV Existing Clients" pipeline
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-green">Lifecycle</span>
+          <span class="badge badge-purple">Triggers sub-workflow</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--green)">
+        <h4><span class="wf-num">14</span> Deal → Lost: Do NOT Downgrade Contact</h4>
+        <div class="wf-logic">
+<span class="kw">TRIGGER:</span> Deal stage changes to <span class="val">Closed Lost</span>
+<span class="kw">THEN:</span> Do NOT change contact lifecycle stage (never downgrade)
+<span class="kw">IF:</span> reopen_eligible = Yes
+<span class="kw">THEN:</span> Create follow-up task in 90 days for deal owner
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-green">Lifecycle</span>
+          <span class="badge badge-gray">Protect existing stage</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP 4: DATA QUALITY -->
+    <div class="wf-group">
+      <div class="wf-group-header">
+        <div class="wf-group-icon" style="background:var(--purple)">DQ</div>
+        <h3>Data Quality — Reporting &amp; Hygiene</h3>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--purple)">
+        <h4><span class="wf-num">15</span> Weekly: Missing Required Fields Report</h4>
+        <div class="wf-logic">
+<span class="kw">SCHEDULE:</span> Every Monday at 9:00 AM
+<span class="kw">ACTION:</span> Generate report of all open deals where:
+   - Stage = SQL but any sql_check field is empty
+   - Stage = Negotiation but amount = 0 or closedate empty
+   - Stage = any but Country is empty
+   - Stage = any but ICP Tier is empty
+<span class="kw">SEND TO:</span> Sales manager + deal owners
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-purple">Data Quality</span>
+          <span class="badge badge-gray">Scheduled report</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--purple)">
+        <h4><span class="wf-num">16</span> Monthly: Circle Back Review</h4>
+        <div class="wf-logic">
+<span class="kw">SCHEDULE:</span> First Monday of each month
+<span class="kw">ACTION:</span> Generate list of all Circle Back deals:
+   - Sort by circle_back_date (upcoming first)
+   - Flag deals with circle_back_count = 2 (max reached)
+   - Include last engagement score
+<span class="kw">SEND TO:</span> Sales team for review meeting
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-purple">Data Quality</span>
+          <span class="badge badge-gray">Monthly cadence</span>
+        </div>
+      </div>
+
+      <div class="wf-card" style="border-left-color:var(--purple)">
+        <h4><span class="wf-num">17</span> Quarterly: Pipeline Hygiene Audit</h4>
+        <div class="wf-logic">
+<span class="kw">SCHEDULE:</span> First week of each quarter
+<span class="kw">ACTION:</span> Full pipeline audit report:
+   - Stale deals (no activity > 30 days, by stage)
+   - Missing data audit (% fill rate per required property)
+   - Conversion rates per stage (vs. targets)
+   - Average days per stage (vs. SLA)
+   - Forecast accuracy: predicted vs. actual close
+<span class="kw">SEND TO:</span> Sales leadership + VP Sales
+        </div>
+        <div class="wf-meta">
+          <span class="badge badge-purple">Data Quality</span>
+          <span class="badge badge-gray">Quarterly cadence</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 5: MIGRATION PLAN     -->
+<!-- ============================= -->
+<section id="migration">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 5</div>
+      <h2>Migration Plan</h2>
+      <p>3-week plan to triage 923 stuck SQL deals and go live with Pipeline v2</p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="tl-block" style="background:var(--orange)">
+        <span class="tl-week">Week 1</span>
+        <span class="tl-name">Triage</span>
+        <span class="tl-detail">Score & bucket 923 deals</span>
+      </div>
+      <div class="tl-block" style="background:var(--navy)">
+        <span class="tl-week">Week 2</span>
+        <span class="tl-name">Enrich</span>
+        <span class="tl-detail">Fill required properties</span>
+      </div>
+      <div class="tl-block" style="background:var(--green)">
+        <span class="tl-week">Week 3</span>
+        <span class="tl-name">Go Live</span>
+        <span class="tl-detail">Activate, move, train</span>
+      </div>
+    </div>
+
+    <!-- Phase 1 -->
+    <div class="phase-card">
+      <div class="phase-header" style="background:var(--orange)">
+        <span>Phase 1 — Triage (Week 1)</span>
+        <span style="font-size:.8em;opacity:.8">923 SQL deals</span>
+      </div>
+      <div class="phase-body">
+        <ol>
+          <li><strong>Export</strong> all 923 SQL deals from HubSpot to spreadsheet</li>
+          <li><strong>Score each deal</strong> on triage criteria:
+            <ul style="margin-top:6px">
+              <li>Has company name? (+1)</li>
+              <li>Has primary contact? (+1)</li>
+              <li>Has deal amount? (+1)</li>
+              <li>Any activity in past 90 days? (+1)</li>
+            </ul>
+          </li>
+          <li><strong>Bucket into 4 groups:</strong></li>
+        </ol>
+
+        <div class="bucket-grid" style="margin-top:16px">
+          <div class="bucket" style="background:var(--green)">
+            <div class="count">~50-100</div>
+            <div class="label">Keep in SQL</div>
+            <div class="text-xs" style="opacity:.8;margin-top:4px">Recent activity + looks qualified</div>
+          </div>
+          <div class="bucket" style="background:#b45309">
+            <div class="count">~200-300</div>
+            <div class="label">Move to Circle Back</div>
+            <div class="text-xs" style="opacity:.8;margin-top:4px">Had engagement but stalled</div>
+          </div>
+          <div class="bucket" style="background:var(--red)">
+            <div class="count">~400-500</div>
+            <div class="label">Move to Closed Lost</div>
+            <div class="text-xs" style="opacity:.8;margin-top:4px">No activity >6 months, no data</div>
+          </div>
+          <div class="bucket" style="background:var(--blue)">
+            <div class="count">~100-200</div>
+            <div class="label">Move to Prospecting</div>
+            <div class="text-xs" style="opacity:.8;margin-top:4px">Never really qualified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-card">
+      <div class="phase-header" style="background:var(--navy)">
+        <span>Phase 2 — Data Enrichment (Week 2)</span>
+        <span style="font-size:.8em;opacity:.8">Property fill</span>
+      </div>
+      <div class="phase-body">
+        <ol>
+          <li><strong>"Keep in SQL" deals</strong> — fill ALL required SQL properties:
+            <ul style="margin-top:4px">
+              <li>Country, ICP Tier, Champion Type, Buyer Persona</li>
+              <li>All 4 SQL checklist items</li>
+              <li>Deal Type B2B, estimated amount</li>
+            </ul>
+          </li>
+          <li><strong>"Circle Back" deals</strong> — set Circle Back Date (batch to next quarter start)</li>
+          <li><strong>"Closed Lost" deals</strong> — set reason as <code>"Historical - Unqualified"</code> (temporary option to add, then archive later)</li>
+          <li><strong>"Prospecting" deals</strong> — assign to SDR for enrichment queue</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-card">
+      <div class="phase-header" style="background:var(--green)">
+        <span>Phase 3 — Go Live (Week 3)</span>
+        <span style="font-size:.8em;opacity:.8">Launch day</span>
+      </div>
+      <div class="phase-body">
+        <ol>
+          <li><strong>Activate new pipeline stages</strong> in HubSpot</li>
+          <li><strong>Execute bulk moves</strong> — move all triaged deals to their new stages</li>
+          <li><strong>Turn on automation rules</strong> — all 17 workflows (stage guards first, then alerts)</li>
+          <li><strong>Train team on new process</strong> — 1hr session covering:
+            <ul style="margin-top:4px">
+              <li>New stage definitions and SLAs</li>
+              <li>Required properties per stage</li>
+              <li>What happens when you skip fields (gates block you)</li>
+              <li>Circle Back rules (max 2)</li>
+            </ul>
+          </li>
+          <li><strong>30-day parallel run</strong> — keep old stages visible but locked, remove after 30 days</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Risk mitigation -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.1em">Risk Mitigation</h3>
+    <div class="risk-grid">
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Data Loss During Migration</h4>
+        <p><strong>Mitigation:</strong> Full export backup before any bulk moves. Use HubSpot "Archive" not "Delete" for properties. 30-day parallel run before removing old stages.</p>
+      </div>
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Team Resistance to New Process</h4>
+        <p><strong>Mitigation:</strong> Involve top performers (Arturo, Philippe) in design. Show them what they win: less clutter, better forecasting, automatic alerts that help them.</p>
+      </div>
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Workflow Errors Blocking Deals</h4>
+        <p><strong>Mitigation:</strong> Activate stage guards first (week 3, day 1). Monitor for 48hrs before enabling auto-move workflows. Have an "emergency off" plan for each workflow.</p>
+      </div>
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Valid Deals Incorrectly Closed</h4>
+        <p><strong>Mitigation:</strong> The "Keep in SQL" bucket gets manual review by sales team, not auto-moved. Reopen Eligible flag on lost deals allows recovery.</p>
+      </div>
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Historical Data Skews Reports</h4>
+        <p><strong>Mitigation:</strong> Use "Historical - Unqualified" as a distinct lost reason. Filter it from pipeline conversion reports. Set a "migration date" property to separate pre/post data.</p>
+      </div>
+      <div class="risk-card" style="border-left:3px solid var(--red)">
+        <h4>Automation Creates Noise</h4>
+        <p><strong>Mitigation:</strong> Start with email-only alerts (not Slack). Review alert volume after 1 week. Tune thresholds before adding Slack notifications.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 6: SUCCESS METRICS    -->
+<!-- ============================= -->
+<section id="metrics">
+  <div class="container">
+    <div class="section-header">
+      <div class="part-label">SECTION 6</div>
+      <h2>Success Metrics</h2>
+      <p>Current state vs. targets — what good looks like in 90 days</p>
+    </div>
+
+    <!-- Current vs Target table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th style="text-align:center;color:#fca5a5">Current</th>
+            <th style="text-align:center">→</th>
+            <th style="text-align:center;color:#86efac">Target (90 Days)</th>
+            <th>Why It Matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Deals in SQL with no activity >30 days</strong></td>
+            <td style="text-align:center"><span class="metric-current">800+</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">&lt;50</span></td>
+            <td class="text-sm">Pipeline is a graveyard. Deals rot instead of moving.</td>
+          </tr>
+          <tr>
+            <td><strong>Deals with close date set</strong></td>
+            <td style="text-align:center"><span class="metric-current">17%</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">&gt;80%</span></td>
+            <td class="text-sm">Can't forecast without close dates. $0 weighted pipeline.</td>
+          </tr>
+          <tr>
+            <td><strong>Closed Lost with reason filled</strong></td>
+            <td style="text-align:center"><span class="metric-current">~50%</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">100%</span></td>
+            <td class="text-sm">Can't learn why you lose if you don't track it.</td>
+          </tr>
+          <tr>
+            <td><strong>Champion type filled</strong></td>
+            <td style="text-align:center"><span class="metric-current">7%</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">&gt;60%</span></td>
+            <td class="text-sm">No champion = no sale. Must track to predict wins.</td>
+          </tr>
+          <tr>
+            <td><strong>Country filled on deals</strong></td>
+            <td style="text-align:center"><span class="metric-current">9%</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">100%</span></td>
+            <td class="text-sm">Can't segment by geography or assign territories.</td>
+          </tr>
+          <tr>
+            <td><strong>Avg days stuck in SQL stage</strong></td>
+            <td style="text-align:center"><span class="metric-current">294 days</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">&lt;30 days</span></td>
+            <td class="text-sm">SQL should be a gate, not a parking lot.</td>
+          </tr>
+          <tr>
+            <td><strong>Pipeline accuracy (forecast vs actual)</strong></td>
+            <td style="text-align:center"><span class="metric-current">Unknown</span></td>
+            <td style="text-align:center" class="color-orange fw-700">→</td>
+            <td style="text-align:center"><span class="metric-target">Track from Day 1</span></td>
+            <td class="text-sm">Foundation for all revenue planning.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Weekly KPIs -->
+    <h3 class="color-navy mt-24 mb-12" style="font-size:1.1em">Weekly KPIs to Track</h3>
+    <div class="metrics-grid">
+      <div class="metric-card" style="border-top:3px solid var(--orange)">
+        <h4>Pipeline Velocity</h4>
+        <div class="metric-row"><span>New deals created</span> <span class="fw-700">Weekly count</span></div>
+        <div class="metric-row"><span>Deals moved forward</span> <span class="fw-700">By stage</span></div>
+        <div class="metric-row"><span>Avg days per stage</span> <span class="fw-700">vs. SLA</span></div>
+        <div class="metric-row"><span>Stale deals (no activity 7+ days)</span> <span class="fw-700">By stage</span></div>
+      </div>
+      <div class="metric-card" style="border-top:3px solid var(--green)">
+        <h4>Conversion Rates</h4>
+        <div class="metric-row"><span>MQL → Outreach</span> <span class="fw-700">Target: 70%</span></div>
+        <div class="metric-row"><span>Outreach → SQL</span> <span class="fw-700">Target: 20%</span></div>
+        <div class="metric-row"><span>SQL → Demo</span> <span class="fw-700">Target: 90%</span></div>
+        <div class="metric-row"><span>Demo → Negotiation</span> <span class="fw-700">Target: 60%</span></div>
+        <div class="metric-row"><span>Negotiation → Won</span> <span class="fw-700">Target: 60%</span></div>
+      </div>
+      <div class="metric-card" style="border-top:3px solid var(--blue)">
+        <h4>Data Quality Score</h4>
+        <div class="metric-row"><span>% deals with all required fields</span> <span class="fw-700">Per stage</span></div>
+        <div class="metric-row"><span>Close date fill rate</span> <span class="fw-700">Target: >80%</span></div>
+        <div class="metric-row"><span>ICP Tier fill rate</span> <span class="fw-700">Target: 100%</span></div>
+        <div class="metric-row"><span>Lost reason fill rate</span> <span class="fw-700">Target: 100%</span></div>
+      </div>
+      <div class="metric-card" style="border-top:3px solid var(--purple)">
+        <h4>Revenue Indicators</h4>
+        <div class="metric-row"><span>Weighted pipeline value</span> <span class="fw-700">Total $</span></div>
+        <div class="metric-row"><span>Commit forecast</span> <span class="fw-700">Deals in Commit</span></div>
+        <div class="metric-row"><span>Avg deal size</span> <span class="fw-700">Current: $31.6K</span></div>
+        <div class="metric-row"><span>Win rate by ICP Tier</span> <span class="fw-700">Tier 1 vs 2 vs 3</span></div>
+      </div>
+    </div>
+
+    <!-- Key data points reference -->
+    <div class="card navy mt-24">
+      <h3>Reference: Current Pipeline Health (from 1,491-deal analysis)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px">
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--red)">923</div>
+          <div class="text-xs">Deals stuck in SQL (62%)</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--red)">83%</div>
+          <div class="text-xs">Deals with NO close date</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--red)">91%</div>
+          <div class="text-xs">Missing country data</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--red)">294</div>
+          <div class="text-xs">Avg days in SQL stage</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--green)">143</div>
+          <div class="text-xs">Total won deals</div>
+        </div>
+        <div style="text-align:center;padding:12px;background:#f0f0f5;border-radius:8px">
+          <div style="font-size:2em;font-weight:800;color:var(--orange)">$31.6K</div>
+          <div class="text-xs">Avg deal size</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="background:var(--navy);color:var(--white);padding:30px 0;text-align:center">
+  <div class="container">
+    <p style="font-size:.95em;font-weight:600">WTW HubSpot Implementation Guide — Pipeline v2</p>
+    <p style="font-size:.8em;opacity:.5;margin-top:6px">Based on analysis of 1,491 deals | 16 new properties | 17 automation rules | 3-week migration</p>
+    <p style="font-size:.75em;opacity:.35;margin-top:12px">Confidential — Wheel the World Internal</p>
+  </div>
+</footer>
+
+<script>
+// Copy to clipboard
+function copyText(el) {
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Copied: ' + text;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1500);
+  });
+}
+
+// Smooth scroll for nav
+document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const top = section.offsetTop - 80;
+    if (scrollY >= top) current = section.getAttribute('id');
+  });
+  navLinks.forEach(link => {
+    link.style.background = link.getAttribute('href') === '#' + current ? 'var(--orange)' : '';
+    link.style.color = link.getAttribute('href') === '#' + current ? '#fff' : '';
+  });
+});
+</script>
+</body>
+</html>
