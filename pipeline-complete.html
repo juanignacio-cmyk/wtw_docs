@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WTW Pipeline & CRM — Complete Guide v3</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1a1a2e;--orange:#FF6B35;--light:#f8f9fa;--white:#fff;--gray:#6c757d;--red:#dc3545;--green:#28a745;--blue:#0d6efd;--yellow:#ffc107;--dark:#343a40;--teal:#0d9488;--purple:#7c3aed}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--light);color:#333;line-height:1.6;display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--navy);color:var(--white);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;padding:20px 0;transition:transform .3s}
+.sidebar .logo{padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:10px;font-size:1.2em;font-weight:700}
+.sidebar .logo span{color:var(--orange)}
+.sidebar .group-label{padding:12px 20px 4px;font-size:.65em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.4);font-weight:700}
+.sidebar a{display:block;padding:8px 20px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.85em;transition:.2s;border-left:3px solid transparent}
+.sidebar a:hover{color:var(--white);background:rgba(255,255,255,.05);border-left-color:var(--orange)}
+.sidebar a.active{color:var(--white);background:rgba(255,107,53,.15);border-left-color:var(--orange);font-weight:600}
+.sidebar-toggle{display:none;position:fixed;top:10px;left:10px;z-index:300;background:var(--navy);color:var(--white);border:0;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:1.2em}
+.main{margin-left:260px;flex:1;min-width:0}
+header{background:var(--navy);color:var(--white);padding:40px 30px;text-align:center}
+header h1{font-size:2.2em;letter-spacing:-1px}header h1 span{color:var(--orange)}
+header p{opacity:.8;margin-top:8px;font-size:1.05em}
+.badge{display:inline-block;background:var(--orange);color:var(--white);padding:3px 14px;border-radius:20px;font-size:.8em;margin-top:10px;font-weight:600}
+.content{max-width:1000px;margin:0 auto;padding:0 30px}
+section{padding:40px 0;border-bottom:1px solid #e9ecef}section:last-child{border:0}
+h2{color:var(--navy);font-size:1.8em;margin-bottom:20px;padding-top:10px}
+h2 .num{color:var(--orange);font-size:.7em;margin-right:6px}
+h3{color:var(--navy);margin:20px 0 10px;font-size:1.2em}
+.card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:16px;border-left:4px solid var(--orange)}
+.card.red{border-left-color:var(--red)}.card.green{border-left-color:var(--green)}.card.blue{border-left-color:var(--blue)}.card.yellow{border-left-color:var(--yellow)}.card.navy{border-left-color:var(--navy)}.card.purple{border-left-color:var(--purple)}.card.teal{border-left-color:var(--teal)}
+.card h3{margin-top:0}
+.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.grid-3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.grid-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat{text-align:center;padding:20px}.stat .num{font-size:2.2em;font-weight:800;color:var(--navy)}.stat .label{font-size:.85em;color:var(--gray);margin-top:4px}.stat.red .num{color:var(--red)}.stat.green .num{color:var(--green)}.stat.orange .num{color:var(--orange)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9em}
+th{background:var(--navy);color:var(--white);padding:10px 12px;text-align:left;font-size:.85em}
+td{padding:10px 12px;border-bottom:1px solid #e9ecef}
+tr:hover{background:rgba(255,107,53,.03)}
+.copy{cursor:pointer;background:#f0f0f0;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:.85em}.copy:hover{background:var(--orange);color:var(--white)}
+.stage-card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:20px;border-top:4px solid var(--orange)}
+.stage-card .stage-name{font-size:1.3em;font-weight:700;color:var(--navy)}
+.stage-card .stage-badge{font-size:.75em;padding:4px 12px;border-radius:12px;font-weight:600;display:inline-block;margin-left:8px}
+.zone-sdr{background:#e3f2fd;color:#1565c0}.zone-pipe{background:#e8f5e9;color:#2e7d32}.zone-exit{background:#fce4ec;color:#c62828}
+.stage-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.stage-meta div{font-size:.9em}.stage-meta .meta-label{font-weight:700;color:var(--gray);font-size:.75em;text-transform:uppercase;letter-spacing:.5px}
+.flow{display:flex;align-items:center;gap:0;overflow-x:auto;padding:20px 0;flex-wrap:wrap;justify-content:center}
+.flow-item{background:var(--white);border:2px solid var(--navy);border-radius:10px;padding:10px 16px;font-size:.8em;font-weight:600;text-align:center;min-width:100px}
+.flow-arrow{font-size:1.2em;color:var(--gray);padding:0 4px}
+.alert{padding:16px 20px;border-radius:8px;margin:16px 0;font-size:.92em}
+.alert.info{background:#e3f2fd;border-left:4px solid var(--blue);color:#1565c0}
+.alert.warn{background:#fff3e0;border-left:4px solid var(--orange);color:#e65100}
+.alert.danger{background:#fce4ec;border-left:4px solid var(--red);color:#c62828}
+.alert.success{background:#e8f5e9;border-left:4px solid var(--green);color:#2e7d32}
+.workflow{background:var(--white);border-radius:8px;padding:16px;margin:12px 0;border:1px solid #e9ecef}
+.workflow .trigger{font-weight:700;color:var(--navy)}.workflow .arrow{color:var(--orange);font-weight:700;margin:0 8px}.workflow .action{color:var(--dark)}
+.chart-box{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin:20px 0}
+.chart-box canvas{max-height:350px}
+.timeline-bar{display:flex;border-radius:8px;overflow:hidden;margin:20px 0;height:50px}
+.timeline-bar div{display:flex;align-items:center;justify-content:center;color:var(--white);font-size:.75em;font-weight:600;text-align:center;padding:0 4px}
+@media(max-width:768px){.sidebar{transform:translateX(-260px)}.sidebar.open{transform:translateX(0)}.sidebar-toggle{display:block}.main{margin-left:0}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}header h1{font-size:1.6em}.flow{flex-direction:column}.flow-arrow{transform:rotate(90deg)}}
+@media print{.sidebar,.sidebar-toggle{display:none}.main{margin-left:0}}
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+<aside class="sidebar">
+  <div class="logo">🚀 <span>WTW</span> Pipeline</div>
+  <div class="group-label">A. Strategy</div>
+  <a href="#current-state">1. Current State</a>
+  <a href="#new-model">2. The New Model</a>
+  <a href="#lifecycle">3. Lifecycle Stages</a>
+  <a href="#sdr-workflow">4. SDR Workflow</a>
+  <a href="#deal-pipeline">5. Deal Pipeline & Entry/Exit</a>
+  <a href="#stage-playbook">6. Stage Playbook</a>
+  <a href="#time-limits">7. Time Limits</a>
+  <a href="#a11y-maturity">8. A11Y Maturity</a>
+  <a href="#icp-tiers">9. ICP Tiers</a>
+  <a href="#champions">10. Champions & Personas</a>
+  <a href="#gap-selling">11. Gap Selling Framework</a>
+  <div class="group-label">B. Implementation</div>
+  <a href="#hubspot-config">12. HubSpot Config</a>
+  <a href="#properties">13. Properties</a>
+  <a href="#workflows">14. Workflows</a>
+  <a href="#migration">15. Migration Plan</a>
+  <div class="group-label">C. Metrics</div>
+  <a href="#nsm">16. North Star Metrics</a>
+  <a href="#dashboard">17. Pipeline Dashboard</a>
+  <a href="#industry">18. Industry Context</a>
+  <div class="group-label">D. Reference</div>
+  <a href="#faq">19. FAQ</a>
+</aside>
+
+<div class="main">
+<header>
+  <h1>WTW <span>Pipeline & CRM</span> Complete Guide</h1>
+  <p>Gap Selling · Lifecycle · Implementation · Metrics</p>
+  <span class="badge">v3 FINAL — March 2026</span>
+</header>
+<div class="content">
+
+<!-- ==================== 1. CURRENT STATE ==================== -->
+<section id="current-state">
+<h2><span class="num">01</span> Current State — What's Broken</h2>
+<div class="alert danger"><strong>Reality check:</strong> "We're not where we planned to be" — CEO, Feb 2026.</div>
+
+<h3>The Problem</h3>
+<div class="grid grid-2">
+  <div class="card red"><h3>❌ Lifecycle = Pipeline</h3><p>SQL, MQL, and Prospecting are lifecycle stages being used as deal stages. Contacts and deals are mixed. This inflates the pipeline and breaks forecasting.</p></div>
+  <div class="card red"><h3>❌ No Discovery Stage</h3><p>Team jumps from "interested" to "demo" without understanding the customer's problem. They try to "generate the problem" during the sale.</p></div>
+  <div class="card red"><h3>❌ Enrichment in Pipeline</h3><p>SDR work (enrichment, outreach) is tracked as deal stages. This inflates pipeline with deals that aren't real opportunities.</p></div>
+  <div class="card red"><h3>❌ No Stage Gates</h3><p>No required fields per stage. Anyone can move deals anywhere. No accountability, no data quality.</p></div>
+</div>
+
+<h3>The Data (1,491 Deals Analyzed)</h3>
+<div class="grid grid-4">
+  <div class="stat red"><div class="num">923</div><div class="label">Stuck in SQL (62%)</div></div>
+  <div class="stat red"><div class="num">83%</div><div class="label">No close date</div></div>
+  <div class="stat red"><div class="num">91%</div><div class="label">Missing country</div></div>
+  <div class="stat red"><div class="num">7%</div><div class="label">Champion tracked</div></div>
+</div>
+
+<h3>What Winning Looks Like</h3>
+<div class="grid grid-3">
+  <div class="stat green"><div class="num">49%</div><div class="label">Wins from referrals</div></div>
+  <div class="stat green"><div class="num">$10-50K</div><div class="label">Sweet spot (72% of wins)</div></div>
+  <div class="stat green"><div class="num">112d</div><div class="label">Median days to close</div></div>
+</div>
+</section>
+
+<!-- ==================== 2. NEW MODEL ==================== -->
+<section id="new-model">
+<h2><span class="num">02</span> The New Model</h2>
+<div class="alert success"><strong>Core principle (Gap Selling):</strong> The deal pipeline begins at Discovery — not before. Everything before Discovery is SDR workflow, not sales pipeline.</div>
+
+<h3>Three Layers, Clearly Separated</h3>
+<div class="grid grid-3">
+  <div class="card blue"><h3>👤 Lifecycle Stage</h3><p>Where is the <strong>CONTACT</strong> in their journey?<br><br>Subscriber → Lead → MQL → SQL → Opportunity → Customer → Evangelist<br><br>Lives on the Contact/Company. Updated automatically.</p></div>
+  <div class="card teal"><h3>📋 Lead Status</h3><p>What is the <strong>SDR</strong> doing with this contact?<br><br>New → Enriching → Outreach → Meeting Booked → Meeting Held<br><br>Lives on the Contact. SDR's workspace.</p></div>
+  <div class="card green"><h3>💰 Deal Pipeline</h3><p>Where is this <strong>DEAL</strong> in the buying process?<br><br>Discovery → Demo → Proposal → Negotiation → Closing Soon → Won/Lost<br><br>Lives on the Deal. Starts when meeting is booked.</p></div>
+</div>
+
+<div style="background:var(--navy);border-radius:16px;padding:30px;margin:20px 0;color:var(--white)">
+  <h3 style="color:var(--white);text-align:center;margin-bottom:20px">How They Connect</h3>
+  <div style="font-family:monospace;font-size:.85em;line-height:2">
+    <div style="color:rgba(255,255,255,.5)">SDR WORKFLOW (pre-deal)</div>
+    <div>Contact created → <span style="color:#64b5f6">Lead Status: New</span> → <span style="color:#64b5f6">Enriching</span> → <span style="color:#64b5f6">Outreach</span> → <span style="color:#64b5f6">Meeting Booked</span></div>
+    <div style="color:var(--orange);font-weight:700;margin:12px 0">↓ DEAL CREATED (Discovery Scheduled) ↓</div>
+    <div style="color:rgba(255,255,255,.5)">DEAL PIPELINE (sales)</div>
+    <div><span style="color:#81c784">Discovery</span> → <span style="color:#81c784">Demo</span> → <span style="color:#81c784">Proposal Sent</span> → <span style="color:#81c784">Negotiation</span> → <span style="color:#81c784">Closing Soon</span> → <span style="color:#4caf50;font-weight:700">Won</span> / <span style="color:#ef5350">Lost</span></div>
+    <div style="margin-top:16px;color:rgba(255,255,255,.5)">LIFECYCLE SYNCS AUTOMATICALLY</div>
+    <div style="font-size:.8em">
+      Contact created → <strong>Lead</strong> · Intent signal → <strong>MQL</strong> · Discovery scheduled (deal created) → <strong>SQL</strong> · Gap confirmed (moves to Demo) → <strong>Opportunity</strong> · Won → <strong>Customer</strong> · Refers/case study → <strong>Evangelist</strong>
+    </div>
+  </div>
+</div>
+
+<div class="alert info"><strong>Why this matters:</strong> Enrichment and Outreach are NOT deal stages. They're SDR activities tracked via Lead Status. This keeps the pipeline clean — only real opportunities with scheduled meetings appear as deals.</div>
+</section>
+
+<!-- ==================== 3. LIFECYCLE ==================== -->
+<section id="lifecycle">
+<h2><span class="num">03</span> Contact Lifecycle Stages</h2>
+
+<div style="background:var(--navy);border-radius:16px;padding:24px;margin:20px 0;color:var(--white)">
+<table style="width:100%;color:var(--white);font-size:.9em">
+<tr><th style="background:transparent;color:var(--orange)">Stage</th><th style="background:transparent;color:var(--orange)">Definition</th><th style="background:transparent;color:var(--orange)">Trigger</th></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Subscriber</strong></td><td style="border-color:rgba(255,255,255,.1)">Newsletter only</td><td style="border-color:rgba(255,255,255,.1)">Content form / opt-in</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Lead</strong></td><td style="border-color:rgba(255,255,255,.1)">Identified, not yet engaged</td><td style="border-color:rgba(255,255,255,.1)">Imported / created / referral</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>MQL</strong></td><td style="border-color:rgba(255,255,255,.1)">Intent or positive engagement</td><td style="border-color:rgba(255,255,255,.1)">Inbound form / referral / positive reply</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>SQL</strong></td><td style="border-color:rgba(255,255,255,.1)">Sales accepted — meeting booked</td><td style="border-color:rgba(255,255,255,.1)">Discovery meeting scheduled</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Opportunity</strong></td><td style="border-color:rgba(255,255,255,.1)">Active deal in pipeline — gap confirmed</td><td style="border-color:rgba(255,255,255,.1)">Discovery held + next step agreed</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Customer</strong></td><td style="border-color:rgba(255,255,255,.1)">Signed contract</td><td style="border-color:rgba(255,255,255,.1)">Deal Won</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Evangelist</strong></td><td style="border-color:rgba(255,255,255,.1)">Refers, case study, advocate</td><td style="border-color:rgba(255,255,255,.1)">Manual (CS/Growth)</td></tr>
+</table>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;font-size:.82em">
+  <div style="background:rgba(255,255,255,.08);padding:10px 14px;border-radius:8px">⬆️ Lifecycle only goes UP — never down</div>
+  <div style="background:rgba(255,255,255,.08);padding:10px 14px;border-radius:8px">🔴 Lost deal ≠ lost relationship — contact stays</div>
+  <div style="background:rgba(255,255,255,.08);padding:10px 14px;border-radius:8px">🔄 One contact can have multiple deals over time</div>
+  <div style="background:rgba(255,255,255,.08);padding:10px 14px;border-radius:8px">🤖 All syncs are automated via workflows</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== 4. SDR WORKFLOW ==================== -->
+<section id="sdr-workflow">
+<h2><span class="num">04</span> SDR Workflow (Pre-Deal)</h2>
+<div class="alert info"><strong>This is NOT the deal pipeline.</strong> Lead Status tracks what the SDR is doing with a contact. It lives on the contact record, not on a deal.</div>
+
+<h3>Lead Status Flow</h3>
+<div class="flow">
+  <div class="flow-item" style="background:#e3f2fd">New</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#e3f2fd">Enriching</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#e3f2fd">Outreach</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#fff3e0;border-color:var(--orange)">Meeting Booked</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#e8f5e9;border-color:var(--green)">Meeting Held</div>
+</div>
+
+<div class="grid grid-2">
+  <div class="stage-card" style="border-top-color:#1565c0">
+    <span class="stage-name">📥 New</span>
+    <p style="margin-top:8px">Contact just entered the system. Source tagged (Inbound, Outbound, Referral, Trade Show).</p>
+    <p><strong>SDR action:</strong> Pick up within 24h (inbound) or 5 days (outbound).</p>
+  </div>
+  <div class="stage-card" style="border-top-color:#1565c0">
+    <span class="stage-name">🔍 Enriching</span>
+    <p style="margin-top:8px">SDR researches: company data, budget signals, A11Y maturity, org type, decision maker.</p>
+    <p><strong>Tools:</strong> Clay, Apollo, LinkedIn, website research.</p>
+    <p><strong>Output:</strong> Company properties filled. ICP tier assigned.</p>
+  </div>
+  <div class="stage-card" style="border-top-color:#1565c0">
+    <span class="stage-name">📧 Outreach</span>
+    <p style="margin-top:8px">Multichannel: email sequence + LinkedIn + phone + event follow-up.</p>
+    <p><strong>Goal:</strong> Get a positive response and book a Discovery meeting.</p>
+    <p><strong>Max:</strong> 30 days. If no response after full sequence → Nurture or Disqualified.</p>
+  </div>
+  <div class="stage-card" style="border-top-color:var(--orange)">
+    <span class="stage-name">📅 Meeting Booked</span>
+    <p style="margin-top:8px">Discovery meeting scheduled. <strong>THIS is when the DEAL is created.</strong></p>
+    <p>Contact lifecycle → SQL. Deal enters pipeline at "Discovery Scheduled."</p>
+    <p>SDR prepares handoff note with all enrichment data + outreach history.</p>
+  </div>
+</div>
+
+<div class="alert warn"><strong>SDR KPI:</strong> Qualified meetings held — not meetings scheduled, not emails sent. The SDR's job is done when the AE has a real conversation with a qualified prospect.</div>
+</section>
+
+<!-- ==================== 5. DEAL PIPELINE ==================== -->
+<section id="deal-pipeline">
+<h2><span class="num">05</span> Deal Pipeline</h2>
+<div class="alert success"><strong>The deal is created when a Discovery meeting is booked.</strong> The pipeline begins here — everything before is SDR workflow.</div>
+
+<h3>Pipeline Stages</h3>
+<div class="flow">
+  <div class="flow-item" style="background:#c8e6c9">Discovery</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#a5d6a7">Demo</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#81c784">Proposal<br>Sent</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#66bb6a">Negotiation</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#4caf50;color:white">Closing<br>Soon</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:#2e7d32;color:white">Won ✅</div>
+</div>
+<div style="text-align:center;color:var(--gray);font-size:.85em;margin-top:8px">
+  Any stage can exit to → <span style="color:var(--red)">Closed Lost ❌</span> (with reason documented)
+</div>
+
+<h3>Entry & Exit Criteria per Stage</h3>
+<table style="margin-top:20px">
+<tr><th>#</th><th>Stage</th><th>Prob.</th><th>Owner</th><th>Entry Criteria (IN)</th><th>Exit Criteria (OUT → next stage)</th><th>Exit → Lost</th></tr>
+<tr><td>1</td><td><strong>Discovery</strong></td><td>20%</td><td>SDR → AE</td><td>Meeting scheduled with ICP contact. Deal created. Lifecycle → SQL.</td><td>Gap identified + quantified. Impact + root cause documented. Next step (Demo) agreed. Lifecycle → Opportunity.</td><td>No-show (after 1 reschedule). No problem found.</td></tr>
+<tr><td>2</td><td><strong>Demo</strong></td><td>40%</td><td>AE</td><td>Discovery completed. Gap documented. Demo scheduled within 3-7 days.</td><td>Client validates fit. Agrees path to proposal. Decision maker identified.</td><td>No fit. Client disengages. DM not accessible.</td></tr>
+<tr><td>3</td><td><strong>Proposal Sent</strong></td><td>60%</td><td>AE</td><td>Demo held. Proposal sent within 48h. Amount >$0. Close date set.</td><td>Stakeholders aligned. Terms discussion begins. Decision date confirmed.</td><td>Ghosted >14d. "Too expensive" without gap justification.</td></tr>
+<tr><td>4</td><td><strong>Negotiation</strong></td><td>75%</td><td>AE</td><td>Active discussion on terms/scope/pricing.</td><td>Legal/procurement confirmed. Signing plan agreed.</td><td>Budget cut. Champion left. No progress 30d.</td></tr>
+<tr><td>5</td><td><strong>Closing Soon</strong></td><td>90%</td><td>AE</td><td>Contract sent + signing date agreed.</td><td>Contract signed + PO received.</td><td>Stalled >21d. Escalate CEO-to-CEO first.</td></tr>
+<tr><td>6</td><td><strong>Closed Won</strong></td><td>100%</td><td>AE → CS</td><td>Signed contract.</td><td>Handoff to CS. Renewal deal created.</td><td>—</td></tr>
+<tr><td>7</td><td><strong>Closed Lost</strong></td><td>0%</td><td>AE</td><td>Deal cannot proceed.</td><td>If "Not now" → reactivation date set. Max 2 reactivations.</td><td>—</td></tr>
+</table>
+
+<div class="alert info"><strong>No "Circle Back" stage.</strong> Use Closed Lost with reason "Not now — timing" + reactivation date. Workflow auto-tasks when date arrives. Max 2 reactivations, then permanent lost. This prevents zombie deals.</div>
+
+<div class="alert warn"><strong>When is the deal created?</strong> When Discovery is SCHEDULED (not held). The AE needs to see the deal to prepare for the meeting. If no-show → Lost (reason: "No show"). SQL lifecycle triggers at deal creation.</div>
+
+<div class="alert success"><strong>Show Rate</strong> is tracked on DEMO, not Discovery. Property: "Demo Scheduled" (checkbox) + "Demo Held" (checkbox). Show Rate = Held / Scheduled. Target: >80%.</div>
+</section>
+
+<!-- ==================== 6. STAGE PLAYBOOK ==================== -->
+<section id="stage-playbook">
+<h2><span class="num">06</span> Stage Playbook</h2>
+
+<div class="stage-card" style="border-top-color:#388e3c">
+  <div><span class="stage-name">🔎 Discovery — Diagnose the Gap</span><span class="stage-badge zone-pipe">Pipeline</span></div>
+  <div class="stage-meta">
+    <div><div class="meta-label">Owner</div>SDR creates deal → AE owns from here</div>
+    <div><div class="meta-label">Time Limit</div>14 days (meeting should happen within first week)</div>
+    <div><div class="meta-label">Key Metric</div>Discovery calls held / week (NSM TOFU)</div>
+    <div><div class="meta-label">Conversion Target</div>Discovery → Demo: 70%</div>
+  </div>
+  <div><strong>Deal creation:</strong> SDR books meeting → creates deal → AE receives with full enrichment context. AE prepares for the call using company data, outreach history, and ICP tier.</div>
+  <div style="margin-top:10px"><strong>Required at deal creation:</strong> Contact, Company, B2B Source, ICP Tier, Deal Type</div>
+  <div style="margin-top:10px"><strong>Required after meeting:</strong> Gap Summary, Champion Type, A11Y Maturity (validated)</div>
+  <div><strong>What happens:</strong> 30-45 min call. AE diagnoses the gap using Gap Selling framework:</div>
+  <ul style="margin:8px 0 0 20px;font-size:.92em">
+    <li><strong>Current State:</strong> Where are they today? What's happening (or not) with accessibility?</li>
+    <li><strong>Impact:</strong> What's the cost of doing nothing? (lost travelers, compliance risk, reputation)</li>
+    <li><strong>Root Cause:</strong> Why hasn't this been solved? (no data, no budget, no expertise)</li>
+    <li><strong>Future State:</strong> What would success look like for them?</li>
+    <li><strong>The Gap:</strong> The distance between current and future state = the sale</li>
+  </ul>
+  <div style="margin-top:10px"><strong>Exit (Success):</strong> Gap confirmed + next step agreed → <strong>Demo</strong> (3-4 days later)</div>
+  <div><strong>Exit (No gap):</strong> → <strong>Closed Lost</strong> (reason: "No problem identified")</div>
+  <div class="alert info" style="margin-top:12px"><strong>Example:</strong> "Visit Nashville has 150+ hotels, zero verified. They lost a $500K group booking last year because a wheelchair user couldn't find accessible options. Their board is asking about ADA compliance but they have no data. Gap = massive. Demo scheduled for Thursday."</div>
+</div>
+
+<div class="stage-card" style="border-top-color:#2e7d32">
+  <div><span class="stage-name">🖥️ Demo — Present the Solution to THEIR Gap</span><span class="stage-badge zone-pipe">Pipeline</span></div>
+  <div class="stage-meta">
+    <div><div class="meta-label">Owner</div>AE (same person who did Discovery)</div>
+    <div><div class="meta-label">Time Limit</div>3-7 days after Discovery (14 days max)</div>
+    <div><div class="meta-label">Key Metric</div>Show Rate % = Demos held / Demos scheduled (NSM MOFU, target >80%)</div>
+    <div><div class="meta-label">Conversion Target</div>Demo → Proposal: 60%</div>
+  </div>
+  <div><strong>What happens:</strong> PERSONALIZED demo addressing their specific gap from Discovery. NOT a generic product tour.</div>
+  <div style="margin-top:10px"><strong>Key rule:</strong> The same person who did Discovery should lead the Demo. They own the diagnosis.</div>
+  <div style="margin-top:10px"><strong>Required:</strong> Demo Date, Decision Maker Present (checkbox)</div>
+  <div><strong>Exit (Success):</strong> Client validates fit + agrees path to proposal → <strong>Proposal Sent</strong></div>
+  <div><strong>Exit (Fail):</strong> No fit, DM not accessible → <strong>Closed Lost</strong></div>
+</div>
+
+<div class="stage-card" style="border-top-color:#1b5e20">
+  <div><span class="stage-name">📋 Proposal Sent</span><span class="stage-badge zone-pipe">Pipeline</span></div>
+  <div class="stage-meta">
+    <div><div class="meta-label">Owner</div>AE</div>
+    <div><div class="meta-label">Time Limit</div>14 days max</div>
+    <div><div class="meta-label">Key Metric</div>Proposal → Negotiation (target: 50%)</div>
+  </div>
+  <div><strong>Required:</strong> Deal Amount (>$0) + Close Date + Stakeholders identified</div>
+</div>
+
+<div class="stage-card" style="border-top-color:#1b5e20">
+  <div><span class="stage-name">💬 Negotiation</span><span class="stage-badge zone-pipe">Pipeline</span></div>
+  <div class="stage-meta">
+    <div><div class="meta-label">Owner</div>AE + Head of Growth (Tier 1)</div>
+    <div><div class="meta-label">Time Limit</div>30 days max</div>
+    <div><div class="meta-label">Key Metric</div>Negotiation → Won (target: 60%)</div>
+  </div>
+  <div><strong>What happens:</strong> Align pricing, scope, timeline. If they say "too expensive" → return to the Gap, not the price.</div>
+  <div><strong>Required:</strong> Legal/procurement process confirmed + signing plan</div>
+</div>
+
+<div class="stage-card" style="border-top-color:#0d4f1c">
+  <div><span class="stage-name">🎯 Closing Soon — Contract to Signature</span><span class="stage-badge zone-pipe">Pipeline</span></div>
+  <div class="stage-meta">
+    <div><div class="meta-label">Owner</div>AE</div>
+    <div><div class="meta-label">Time Limit</div>21 days max</div>
+    <div><div class="meta-label">Entry</div>Contract sent + signing date agreed</div>
+  </div>
+  <div><strong>What happens:</strong> Contract sent, waiting for signature. Follow up every 3-5 days.</div>
+  <div style="margin-top:10px"><strong>Required:</strong> Contract Sent Date, Expected Signing Date</div>
+  <div><strong>Exit (Success):</strong> Signed → <strong>Closed Won</strong></div>
+  <div><strong>Exit (Fail):</strong> Stalled >21d → Escalate CEO-to-CEO, then → <strong>Closed Lost</strong></div>
+</div>
+
+<div class="grid grid-2">
+  <div class="stage-card" style="border-top-color:var(--green)"><span class="stage-name">✅ Closed Won</span><p style="margin-top:8px">Contract signed. Handoff to CS. Lifecycle → Customer. Create renewal deal. Won reason documented.</p></div>
+  <div class="stage-card" style="border-top-color:var(--red)"><span class="stage-name">❌ Closed Lost</span><p style="margin-top:8px"><strong>Required:</strong> Loss reason (dropdown). If "Not now — timing" → set reactivation date. Workflow auto-tasks when date arrives. Max 2 reactivations, then permanent lost.</p></div>
+</div>
+</section>
+
+<!-- ==================== 7. TIME LIMITS ==================== -->
+<section id="time-limits">
+<h2><span class="num">07</span> Time Limits</h2>
+
+<div class="timeline-bar">
+  <div style="flex:14;background:#388e3c">Discovery<br>14d</div>
+  <div style="flex:7;background:#2e7d32">Demo<br>7d</div>
+  <div style="flex:14;background:#1b5e20">Proposal<br>14d</div>
+  <div style="flex:30;background:#0d4f1c">Negotiation<br>30d</div>
+  <div style="flex:21;background:#004d00">Closing<br>21d</div>
+</div>
+
+<table>
+<tr><th>Stage</th><th>Target</th><th>Max</th><th>If Exceeded</th></tr>
+<tr><td>Discovery</td><td>Meeting within 5 days of booking</td><td>14 days</td><td>No-show → reschedule once, then Lost. No gap → Lost.</td></tr>
+<tr><td>Demo</td><td>3-4 days after Discovery</td><td>7 days</td><td>Alert to AE. Track show rate (>80%).</td></tr>
+<tr><td>Proposal Sent</td><td>48h after Demo</td><td>14 days</td><td>Alert to AE</td></tr>
+<tr><td>Negotiation</td><td>21 days</td><td>30 days</td><td>Escalate to Head of Growth/CEO</td></tr>
+<tr><td>Closing Soon</td><td>14 days</td><td>21 days</td><td>CEO-to-CEO call. Then → Lost.</td></tr>
+</table>
+
+<div class="grid grid-2" style="margin-top:20px">
+  <div class="card green"><h3>🎯 Target Cycle: 50-65 days</h3><p>Discovery to Won for a healthy deal.</p></div>
+  <div class="card yellow"><h3>⏰ Maximum: ~86 days</h3><p>If a deal hits every limit. After that → Lost.</p></div>
+</div>
+</section>
+
+<!-- ==================== 8. A11Y MATURITY ==================== -->
+<section id="a11y-maturity">
+<h2><span class="num">08</span> Accessibility Maturity Model</h2>
+<p style="color:var(--gray);margin-bottom:20px">Company-level property — estimated in Enrichment (SDR), validated in Discovery (AE). Impacts ICP tier scoring and sales approach.</p>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-radius:12px;overflow:hidden;margin:20px 0;box-shadow:0 4px 20px rgba(0,0,0,.1)">
+  <div style="background:#1b5e20;color:white;padding:24px 16px;text-align:center">
+    <div style="font-size:2em;margin-bottom:8px">🏆</div>
+    <div style="font-weight:700;font-size:1.1em">Advanced</div>
+    <div style="font-size:.8em;opacity:.8;margin-top:8px">Dedicated A11Y person/team, existing program</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:8px;margin-top:12px;font-size:.75em"><strong>Signals:</strong> A11Y page, staff listed, public reports</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.8em;font-weight:600">Fastest close · "We enhance what you have"</div>
+  </div>
+  <div style="background:#388e3c;color:white;padding:24px 16px;text-align:center">
+    <div style="font-size:2em;margin-bottom:8px">📋</div>
+    <div style="font-weight:700;font-size:1.1em">Committed</div>
+    <div style="font-size:.8em;opacity:.8;margin-top:8px">Public commitment, some initiatives, no dedicated person</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:8px;margin-top:12px;font-size:.75em"><strong>Signals:</strong> A11Y in mission, trainings done</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.8em;font-weight:600">Good fit · "We turn commitment into program"</div>
+  </div>
+  <div style="background:#f57f17;color:white;padding:24px 16px;text-align:center">
+    <div style="font-size:2em;margin-bottom:8px">💡</div>
+    <div style="font-weight:700;font-size:1.1em">Aware</div>
+    <div style="font-size:.8em;opacity:.8;margin-top:8px">Knows it matters, hasn't acted, ADA minimum</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:8px;margin-top:12px;font-size:.75em"><strong>Signals:</strong> No A11Y page, responds to questions</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.8em;font-weight:600">Longer cycle · "Here's what you're missing"</div>
+  </div>
+  <div style="background:#b71c1c;color:white;padding:24px 16px;text-align:center">
+    <div style="font-size:2em;margin-bottom:8px">❓</div>
+    <div style="font-weight:700;font-size:1.1em">Unaware</div>
+    <div style="font-size:.8em;opacity:.8;margin-top:8px">Hasn't considered accessibility</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:8px;margin-top:12px;font-size:.75em"><strong>Signals:</strong> No mentions anywhere</div>
+    <div style="background:rgba(255,255,255,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.8em;font-weight:600">Almost anti-ICP · Unless grant/mandate</div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== 9. ICP TIERS ==================== -->
+<section id="icp-tiers">
+<h2><span class="num">09</span> ICP Tiers & Scoring</h2>
+
+<div style="background:var(--navy);border-radius:16px;padding:24px;margin:20px 0;color:var(--white)">
+<h3 style="color:var(--orange);margin-top:0">Tier = Budget + A11Y Maturity + Org Type</h3>
+<table style="width:100%;color:var(--white)">
+<tr><th style="background:transparent;color:var(--orange)">Factor</th><th style="background:transparent;color:var(--orange)">+3</th><th style="background:transparent;color:var(--orange)">+2</th><th style="background:transparent;color:var(--orange)">+1</th><th style="background:transparent;color:var(--orange)">0</th></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Annual Tourism Budget</strong></td><td style="border-color:rgba(255,255,255,.1)">$5M+</td><td style="border-color:rgba(255,255,255,.1)">$1M–$5M</td><td style="border-color:rgba(255,255,255,.1)">$500K–$1M</td><td style="border-color:rgba(255,255,255,.1)">&lt;$500K / Unknown</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>A11Y Maturity</strong></td><td style="border-color:rgba(255,255,255,.1)">Advanced</td><td style="border-color:rgba(255,255,255,.1)">Committed</td><td style="border-color:rgba(255,255,255,.1)">Aware</td><td style="border-color:rgba(255,255,255,.1)">Unaware</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Org Type</strong></td><td style="border-color:rgba(255,255,255,.1)">State Tourism / Metro CVB</td><td style="border-color:rgba(255,255,255,.1)">City-County DMO</td><td style="border-color:rgba(255,255,255,.1)">Regional / Chamber</td><td style="border-color:rgba(255,255,255,.1)">Other</td></tr>
+</table>
+<div style="text-align:center;margin-top:12px;font-size:.85em;opacity:.7">Max = 9 · Geography captured separately for prioritization (US first)</div>
+</div>
+
+<table>
+<tr><th>Tier</th><th>Score</th><th>Who</th><th>Deal Size</th><th>Win Rate</th><th>Sales Motion</th></tr>
+<tr style="background:rgba(40,167,69,.08)"><td><strong>Tier 1 Strategic</strong></td><td>8-9</td><td>State Tourism, Large Metro CVBs</td><td>$50K–$450K+</td><td style="color:var(--green);font-weight:700">77%</td><td>VP Sales-led, exec-to-exec</td></tr>
+<tr style="background:rgba(13,110,253,.05)"><td><strong>Tier 2 Core</strong></td><td>6-7</td><td>Mid-size DMOs/CVBs</td><td>$20K–$50K</td><td style="color:var(--green);font-weight:700">76%</td><td>AE-led post SDR qual</td></tr>
+<tr style="background:rgba(255,193,7,.08)"><td><strong>Tier 3 Growth</strong></td><td>4-5</td><td>Small DMOs, chambers</td><td>$10K–$20K</td><td style="color:var(--orange);font-weight:700">36% ⚠️</td><td>SDR-led, template proposals</td></tr>
+<tr><td><strong>Tier 4 Enterprise</strong></td><td>varies</td><td>Hotels, cruise, OTAs, agencies</td><td>$50K–$300K+</td><td style="color:var(--green)">100%</td><td>VP Sales + CEO, pilot → expand</td></tr>
+<tr><td><strong>Tier 5 Nurture</strong></td><td>0-3</td><td>Very small, international, limited fit</td><td>$5K–$15K</td><td>71%</td><td>Automated nurture only</td></tr>
+</table>
+<div class="alert warn"><strong>⚠️ Tier 3 = 36% win rate.</strong> Half of Tier 1/2. These deals need stronger qualification or deprioritization.</div>
+</section>
+
+<!-- ==================== 10. CHAMPIONS ==================== -->
+<section id="champions">
+<h2><span class="num">10</span> Champions & Buyer Personas</h2>
+
+<div style="background:var(--navy);border-radius:16px;padding:24px;margin:0 0 20px;color:var(--white)">
+<table style="width:100%;color:var(--white);font-size:.9em">
+<tr><th style="background:transparent;color:var(--orange)">Concept</th><th style="background:transparent;color:var(--orange)">Measures</th><th style="background:transparent;color:var(--orange)">Level</th><th style="background:transparent;color:var(--orange)">Example</th></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Buyer Persona</strong></td><td style="border-color:rgba(255,255,255,.1)">Job ROLE</td><td style="border-color:rgba(255,255,255,.1)">Contact</td><td style="border-color:rgba(255,255,255,.1)">"Tourism Director"</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Job Title</strong></td><td style="border-color:rgba(255,255,255,.1)">Exact TITLE</td><td style="border-color:rgba(255,255,255,.1)">Contact</td><td style="border-color:rgba(255,255,255,.1)">"Director of Tourism & Cultural Affairs"</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>Champion</strong></td><td style="border-color:rgba(255,255,255,.1)">Will they sell INTERNALLY?</td><td style="border-color:rgba(255,255,255,.1)">Deal</td><td style="border-color:rgba(255,255,255,.1)">"She's presenting our proposal to the board"</td></tr>
+<tr><td style="border-color:rgba(255,255,255,.1)"><strong>A11Y Maturity</strong></td><td style="border-color:rgba(255,255,255,.1)">How advanced is the ORG?</td><td style="border-color:rgba(255,255,255,.1)">Company</td><td style="border-color:rgba(255,255,255,.1)">"Committed — has initiatives, no dedicated person"</td></tr>
+</table>
+</div>
+
+<div class="grid grid-3">
+  <div class="card green"><h3>💪 Strong Champion</h3><p>Can sell internally. Has authority. Actively advocates. Shares internal info. <strong>Deals close 3x faster.</strong></p></div>
+  <div class="card yellow"><h3>🤝 Weak Champion</h3><p>Interested but lacks influence. Too junior or wrong dept. Needs coaching + ROI data to sell internally.</p></div>
+  <div class="card red"><h3>👤 Not a Champion</h3><p>Just exploring. No commitment. Won't go to bat. <strong>If this is your only contact, deal is at risk.</strong></p></div>
+</div>
+</section>
+
+<!-- ==================== 11. GAP SELLING ==================== -->
+<section id="gap-selling">
+<h2><span class="num">11</span> Gap Selling Framework</h2>
+<div class="alert info"><strong>Core principle:</strong> "Nobody buys anything without having a problem first." — Keenan. Your job is to diagnose the gap between current state and future state. The bigger the gap, the more urgent the sale.</div>
+
+<div style="background:var(--navy);border-radius:16px;padding:30px;margin:20px 0;color:var(--white);text-align:center">
+  <div style="display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap">
+    <div style="background:rgba(239,83,80,.2);border:2px solid #ef5350;border-radius:12px;padding:20px;min-width:200px">
+      <div style="font-size:1.5em;margin-bottom:8px">😰</div>
+      <div style="font-weight:700">Current State</div>
+      <div style="font-size:.8em;opacity:.8;margin-top:8px">Where they are today<br>Problems, inefficiencies, risks</div>
+    </div>
+    <div>
+      <div style="font-size:2.5em;color:var(--orange)">← THE GAP →</div>
+      <div style="font-size:.8em;opacity:.7;margin-top:4px">This is what you're selling</div>
+    </div>
+    <div style="background:rgba(76,175,80,.2);border:2px solid #4caf50;border-radius:12px;padding:20px;min-width:200px">
+      <div style="font-size:1.5em;margin-bottom:8px">🎯</div>
+      <div style="font-weight:700">Future State</div>
+      <div style="font-size:.8em;opacity:.8;margin-top:8px">Where they want to be<br>Goals, outcomes, impact</div>
+    </div>
+  </div>
+</div>
+
+<h3>Key Principles</h3>
+<div class="grid grid-2">
+  <div class="card"><h3>🚫 Don't lead with BANT</h3><p>Budget, Authority, Need, Timeline should <strong>emerge from Discovery</strong>, not be a checklist the SDR fills before the meeting. Keenan: "BANT is bunk."</p></div>
+  <div class="card"><h3>🔍 Discovery = The Close</h3><p>A well-executed Discovery is where the sale is won. A demo without diagnosis is generic and lowers win rate.</p></div>
+  <div class="card"><h3>🎯 Sell the Gap, Not Features</h3><p>Nobody cares about your product. They care about closing the gap between their current pain and their desired outcome.</p></div>
+  <div class="card"><h3>💡 The Buyer Doesn't Know Their Problem</h3><p>This is why Discovery ≠ Demo. In Discovery, you help them SEE the problem. In Demo, you show how you SOLVE it.</p></div>
+</div>
+</section>
+
+<!-- ==================== 12. HUBSPOT CONFIG ==================== -->
+<section id="hubspot-config">
+<h2><span class="num">12</span> HubSpot Configuration</h2>
+
+<h3>Deal Pipeline Setup</h3>
+<table>
+<tr><th>#</th><th>Stage Name</th><th>Probability</th><th>Max Days</th><th>Owner</th></tr>
+<tr><td>1</td><td>Discovery</td><td>20%</td><td>14d</td><td>SDR → AE</td></tr>
+<tr><td>2</td><td>Demo</td><td>40%</td><td>7d post-disc.</td><td>AE</td></tr>
+<tr><td>3</td><td>Proposal Sent</td><td>60%</td><td>14d</td><td>AE</td></tr>
+<tr><td>4</td><td>Negotiation</td><td>75%</td><td>30d</td><td>AE</td></tr>
+<tr><td>5</td><td>Closing Soon</td><td>90%</td><td>21d</td><td>AE</td></tr>
+<tr><td>6</td><td>Closed Won</td><td>100%</td><td>—</td><td>AE → CS</td></tr>
+<tr><td>7</td><td>Closed Lost</td><td>0%</td><td>—</td><td>AE</td></tr>
+</table>
+
+<h3>Lead Status Setup (Contact Property)</h3>
+<table>
+<tr><th>Status</th><th>Meaning</th><th>Owner</th></tr>
+<tr><td>New</td><td>Just entered, not yet worked</td><td>Auto / Marketing</td></tr>
+<tr><td>Enriching</td><td>SDR researching</td><td>SDR</td></tr>
+<tr><td>Outreach</td><td>SDR contacting</td><td>SDR</td></tr>
+<tr><td>Meeting Booked</td><td>Discovery scheduled (deal created)</td><td>SDR</td></tr>
+<tr><td>Meeting Held</td><td>Discovery completed</td><td>AE</td></tr>
+<tr><td>Nurture</td><td>Not ready now, stay in touch</td><td>Marketing</td></tr>
+<tr><td>Disqualified</td><td>Not ICP or unresponsive</td><td>SDR</td></tr>
+</table>
+</section>
+
+<!-- ==================== 13. PROPERTIES ==================== -->
+<section id="properties">
+<h2><span class="num">13</span> Properties</h2>
+
+<h3 style="color:var(--purple)">🏢 Company Properties (12)</h3>
+<table>
+<tr><th>Property</th><th>Type</th><th>Options</th><th>Required At</th></tr>
+<tr><td>ICP Tier</td><td>Dropdown</td><td>Tier 1–5</td><td>Deal creation</td></tr>
+<tr><td>Organization Type</td><td>Dropdown</td><td>State Tourism / Metro CVB / City-County DMO / Regional Board / Chamber / Hotel Group / Cruise / OTA-Tech / Agency-Media / Attraction / Airport-Convention / International</td><td>Deal creation</td></tr>
+<tr><td>Accessibility Maturity</td><td>Dropdown</td><td>Advanced / Committed / Aware / Unaware</td><td>Enrichment → Discovery</td></tr>
+<tr><td>Country</td><td>Dropdown</td><td>Standard</td><td>Deal creation</td></tr>
+<tr><td>State/Region</td><td>Dropdown</td><td>US 50 + DC + Canada + Intl</td><td>Optional</td></tr>
+<tr><td>Annual Tourism Budget</td><td>Dropdown</td><td>&lt;$500K / $500K–$1M / $1M–$5M / $5M–$20M / $20M+ / Unknown</td><td>Discovery</td></tr>
+<tr><td>Budget Type</td><td>Dropdown</td><td>Tax Revenue / Membership / Government / Mixed / Private / Unknown</td><td>Discovery</td></tr>
+<tr><td>Fiscal Year End</td><td>Dropdown</td><td>Jan-Dec / State Fiscal (Jun) / Federal (Sep)</td><td>Discovery</td></tr>
+<tr><td>Current A11Y Status</td><td>Dropdown</td><td>No program / Self-reported / Partial / WTW Verified / Competitor / ADA audit only</td><td>Discovery</td></tr>
+<tr><td>Estimated Portfolio Size</td><td>Number</td><td>—</td><td>Discovery</td></tr>
+<tr><td>Grant Eligible</td><td>Checkbox</td><td>—</td><td>Optional</td></tr>
+<tr><td>Website URL</td><td>URL</td><td>—</td><td>Enrichment</td></tr>
+</table>
+
+<h3 style="color:var(--green);margin-top:30px">💰 Deal Properties</h3>
+<table>
+<tr><th>Property</th><th>Type</th><th>Required At</th><th>Definition</th></tr>
+<tr><td>B2B Source</td><td>Dropdown</td><td>Deal creation</td><td>How this opportunity originated: Outbound / Inbound / Referral / Trade Show</td></tr>
+<tr><td>Event Source</td><td>Dropdown</td><td>If Trade Show</td><td>Which event: TravelAbility / DI / IPW / Marketing Summit / Other</td></tr>
+<tr><td>Deal Type B2B</td><td>Dropdown</td><td>Deal creation</td><td>DV / MS / DV+MS / Hotels / Airports</td></tr>
+<tr><td>Champion Type</td><td>Dropdown</td><td>Discovery Held</td><td>Strong / Weak / Not a Champion</td></tr>
+<tr><td>Gap Summary</td><td>Text</td><td>Discovery Held</td><td>1-2 sentence summary of the gap identified</td></tr>
+<tr><td>Demo Date</td><td>Date</td><td>Demo</td><td>When demo was held</td></tr>
+<tr><td>Decision Maker Present</td><td>Checkbox</td><td>Demo</td><td>Was actual decision maker in the demo?</td></tr>
+<tr><td>Amount</td><td>Currency</td><td>Proposal</td><td>Deal value (must be >$0)</td></tr>
+<tr><td>Close Date</td><td>Date</td><td>Proposal</td><td>Expected close date</td></tr>
+<tr><td>Forecast Category</td><td>Dropdown</td><td>Negotiation</td><td>Commit / Best Case / Pipeline</td></tr>
+<tr><td>Closed Lost Reason</td><td>Dropdown</td><td>Lost</td><td>No problem / Price / Timing / Competition / No decision / Budget cut / Champion left / Other</td></tr>
+<tr><td>Reactivation Date</td><td>Date</td><td>Lost (if timing)</td><td>When to re-engage. Workflow auto-tasks.</td></tr>
+<tr><td>Won Reason</td><td>Dropdown</td><td>Won</td><td>Product Fit / Price / Relationship / Grant / Event Follow-up</td></tr>
+</table>
+
+<h3 style="color:var(--blue);margin-top:30px">👤 Contact Properties</h3>
+<table>
+<tr><th>Property</th><th>Type</th><th>Definition</th></tr>
+<tr><td>Lead Status</td><td>Dropdown</td><td>New / Enriching / Outreach / Meeting Booked / Meeting Held / Nurture / Disqualified</td></tr>
+<tr><td>Buyer Persona</td><td>Dropdown</td><td>Tourism Director / Marketing VP / A11Y Lead / CEO / Ops Director / Grant Manager / Other</td></tr>
+<tr><td>Job Title</td><td>Text</td><td>Exact title (free text)</td></tr>
+<tr><td>Contact Role</td><td>Dropdown</td><td>Decision Maker / Champion / Influencer / Budget Holder / End User / Blocker</td></tr>
+</table>
+</section>
+
+<!-- ==================== 14. WORKFLOWS ==================== -->
+<section id="workflows">
+<h2><span class="num">14</span> Workflows</h2>
+
+<h3>Lifecycle Syncs (Automatic)</h3>
+<div class="workflow"><span class="trigger">Deal created (Discovery meeting scheduled)</span><span class="arrow">→</span><span class="action">Contact lifecycle → SQL</span></div>
+<div class="workflow"><span class="trigger">Deal moves to Demo (gap confirmed, next step agreed)</span><span class="arrow">→</span><span class="action">Contact lifecycle → Opportunity</span></div>
+<div class="workflow"><span class="trigger">Deal → Closed Won</span><span class="arrow">→</span><span class="action">Contact lifecycle → Customer. Trigger CS handoff.</span></div>
+
+<h3>Stage Gates</h3>
+<div class="workflow"><span class="trigger">Deal moves to Demo</span><span class="arrow">→</span><span class="action">IF Gap Summary empty → Block. "Document the gap from Discovery before scheduling Demo."</span></div>
+<div class="workflow"><span class="trigger">Deal moves to Proposal Sent</span><span class="arrow">→</span><span class="action">IF Amount = $0 OR Close Date empty → Block.</span></div>
+<div class="workflow"><span class="trigger">Deal moves to Closed Lost</span><span class="arrow">→</span><span class="action">IF Lost Reason empty → Block. "Select a loss reason."</span></div>
+
+<h3>Time-Based Alerts</h3>
+<div class="workflow"><span class="trigger">Discovery Scheduled: No activity 3 days</span><span class="arrow">→</span><span class="action">Alert AE: "Discovery meeting approaching — are you prepared?"</span></div>
+<div class="workflow"><span class="trigger">Discovery Scheduled: 7 days, no meeting held</span><span class="arrow">→</span><span class="action">Alert: "No-show? Reschedule or close." +7 days → auto-Lost</span></div>
+<div class="workflow"><span class="trigger">Negotiation: No activity 7 days</span><span class="arrow">→</span><span class="action">Weekly alert. Day 30 → escalate to Head of Growth</span></div>
+
+<h3>Reactivation</h3>
+<div class="workflow"><span class="trigger">Closed Lost + Reactivation Date arrives</span><span class="arrow">→</span><span class="action">Auto-task to AE: "Re-engage this prospect." If 2nd reactivation → permanent lost.</span></div>
+
+<h3>Data Quality (Weekly)</h3>
+<div class="workflow"><span class="trigger">Every Monday 9am</span><span class="arrow">→</span><span class="action">Report: Deals with missing required fields per stage → Email to Head of Growth</span></div>
+</section>
+
+<!-- ==================== 15. MIGRATION ==================== -->
+<section id="migration">
+<h2><span class="num">15</span> Migration Plan</h2>
+
+<div class="timeline-bar" style="height:60px">
+  <div style="flex:1;background:var(--red)">Week 1<br>Triage</div>
+  <div style="flex:1;background:var(--orange)">Week 2<br>Build</div>
+  <div style="flex:1;background:var(--green)">Week 3<br>Go Live</div>
+</div>
+
+<h3>Phase 1: Triage (Week 1)</h3>
+<p>923 deals stuck in SQL → score and redistribute:</p>
+<div class="grid grid-3">
+  <div class="card green"><h3>Active (~50-100)</h3><p>Recent activity + qualified → Move to Discovery Scheduled/Held</p></div>
+  <div class="card red"><h3>Dead (~500+)</h3><p>No activity >6 months → Closed Lost ("Historical")</p></div>
+  <div class="card yellow"><h3>Maybe (~200-300)</h3><p>Some engagement → Closed Lost ("Not now") + reactivation date</p></div>
+</div>
+
+<h3>Phase 2: Build (Week 2)</h3>
+<ul style="margin-left:20px">
+  <li>Create new pipeline stages</li>
+  <li>Create all properties (company, deal, contact)</li>
+  <li>Set up Lead Status on contacts</li>
+  <li>Build workflows (lifecycle syncs, stage gates, alerts)</li>
+</ul>
+
+<h3>Phase 3: Go Live (Week 3)</h3>
+<ol style="margin-left:20px">
+  <li>Execute bulk deal moves</li>
+  <li>Train team (1-hour session)</li>
+  <li>30-day parallel run</li>
+  <li>Remove old pipeline stages</li>
+</ol>
+</section>
+
+<!-- ==================== 16. NSM ==================== -->
+<section id="nsm">
+<h2><span class="num">16</span> North Star Metrics</h2>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-radius:16px;overflow:hidden;margin:20px 0;box-shadow:0 4px 20px rgba(0,0,0,.1)">
+  <div style="background:#1565c0;color:white;padding:30px 20px;text-align:center">
+    <div style="font-size:.7em;text-transform:uppercase;letter-spacing:2px;opacity:.7">TOFU</div>
+    <div style="font-size:2em;font-weight:800;margin:10px 0">Discovery Calls</div>
+    <div style="font-size:.9em;opacity:.9">Qualified meetings held per week</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:12px;margin-top:16px;font-size:.85em;text-align:left">
+      <strong>Owner:</strong> SDR<br>
+      <strong>Target:</strong> 15 meetings/month<br>
+      <strong>Track:</strong> Monday report<br>
+      <strong>Support:</strong> ICP fit rate, speed-to-lead, show rate
+    </div>
+  </div>
+  <div style="background:var(--orange);color:white;padding:30px 20px;text-align:center">
+    <div style="font-size:.7em;text-transform:uppercase;letter-spacing:2px;opacity:.7">MOFU</div>
+    <div style="font-size:2em;font-weight:800;margin:10px 0">Show Rate %</div>
+    <div style="font-size:.9em;opacity:.9">Demos held / Demos scheduled</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:12px;margin-top:16px;font-size:.85em;text-align:left">
+      <strong>Owner:</strong> AE<br>
+      <strong>Target:</strong> >80% show rate<br>
+      <strong>Track:</strong> Wednesday check<br>
+      <strong>Support:</strong> DM present at demo, Discovery→Demo days
+    </div>
+  </div>
+  <div style="background:#2e7d32;color:white;padding:30px 20px;text-align:center">
+    <div style="font-size:.7em;text-transform:uppercase;letter-spacing:2px;opacity:.7">BOFU</div>
+    <div style="font-size:2em;font-weight:800;margin:10px 0">Win Rate %</div>
+    <div style="font-size:.9em;opacity:.9">Won / (Won + Lost) by ACV segment</div>
+    <div style="background:rgba(255,255,255,.15);border-radius:8px;padding:12px;margin-top:16px;font-size:.85em;text-align:left">
+      <strong>Owner:</strong> VP Sales + Head of Growth<br>
+      <strong>Target:</strong> >60% overall, >75% Tier 1/2<br>
+      <strong>Track:</strong> Friday review<br>
+      <strong>Support:</strong> Cycle length, avg deal, forecast accuracy
+    </div>
+  </div>
+</div>
+
+<h3>Weekly Rhythm</h3>
+<table>
+<tr><th>Day</th><th>Meeting</th><th>Owner</th><th>Focus</th></tr>
+<tr><td><strong>Monday</strong></td><td>Pipeline Input Review</td><td>Head of Growth</td><td>New leads, source quality, Discovery calls booked</td></tr>
+<tr><td><strong>Wednesday</strong></td><td>Demo & Discovery Check</td><td>AE Lead</td><td>Show rates, discovery quality, stuck deals</td></tr>
+<tr><td><strong>Friday</strong></td><td>Pipeline Review</td><td>VP Sales + Growth</td><td>Win/loss, bottleneck of the week, forecast</td></tr>
+</table>
+
+<h3>SDR Metrics</h3>
+<table>
+<tr><th>Metric</th><th>Type</th><th>Target</th></tr>
+<tr><td><strong>Qualified meetings held</strong></td><td>NSM</td><td>15/month</td></tr>
+<tr><td>Meetings scheduled</td><td>Input</td><td>20/month (accounting for no-shows)</td></tr>
+<tr><td>Show rate</td><td>Quality</td><td>>75%</td></tr>
+<tr><td>ICP fit rate</td><td>Quality</td><td>>80% of meetings are with ICP contacts</td></tr>
+<tr><td>Speed-to-lead (inbound)</td><td>Efficiency</td><td>&lt;24h</td></tr>
+</table>
+
+<h3>AE Metrics</h3>
+<table>
+<tr><th>Metric</th><th>Type</th><th>Target</th></tr>
+<tr><td><strong>Closed won revenue</strong></td><td>NSM</td><td>Per quota</td></tr>
+<tr><td>Win rate by ACV</td><td>Quality</td><td>>60% overall</td></tr>
+<tr><td>Sales cycle (median)</td><td>Efficiency</td><td>&lt;60 days</td></tr>
+<tr><td>Average deal size</td><td>Quality</td><td>$40K+</td></tr>
+<tr><td>Forecast accuracy</td><td>Quality</td><td>±15%</td></tr>
+<tr><td>% deals with next step</td><td>Health</td><td>100%</td></tr>
+</table>
+</section>
+
+<!-- ==================== 17. DASHBOARD ==================== -->
+<section id="dashboard">
+<h2><span class="num">17</span> Pipeline Dashboard</h2>
+<p style="color:var(--gray);margin-bottom:20px">Mockup — will connect to HubSpot API when approved.</p>
+
+<h3>Deal Pipeline Funnel</h3>
+<div class="chart-box"><canvas id="funnelChart"></canvas></div>
+
+<h3>Conversion Rates (Target)</h3>
+<div class="chart-box"><canvas id="conversionChart"></canvas></div>
+
+<h3>Revenue Forecast</h3>
+<div class="grid grid-3">
+  <div class="stat green"><div class="num">$1.2M</div><div class="label">Commit (80%+)</div></div>
+  <div class="stat orange"><div class="num">$800K</div><div class="label">Best Case (50-79%)</div></div>
+  <div class="stat"><div class="num">$2.5M</div><div class="label">Total Pipeline</div></div>
+</div>
+</section>
+
+<!-- ==================== 18. INDUSTRY ==================== -->
+<section id="industry">
+<h2><span class="num">18</span> Industry Context</h2>
+<div class="grid grid-2">
+  <div class="stat green"><div class="num">$92.7B</div><div class="label">Accessible Tourism (2024)</div></div>
+  <div class="stat green"><div class="num">$172.8B</div><div class="label">Projected 2033 (7.1% CAGR)</div></div>
+</div>
+<div class="grid grid-2" style="margin-top:20px">
+  <div class="card"><h3>72%</h3><p>of DMOs say <strong>economic impact</strong> = #1 stakeholder metric</p></div>
+  <div class="card"><h3>61%</h3><p>say <strong>budget is biggest challenge</strong> → sell ROI, not features</p></div>
+  <div class="card"><h3>82%</h3><p>of NA DMOs = <strong>local/municipal level</strong> (small teams ≤10 FTEs)</p></div>
+  <div class="card"><h3>49%</h3><p>say <strong>attribution is top barrier</strong> → WTW booking data solves this</p></div>
+</div>
+</section>
+
+<!-- ==================== 19. FAQ ==================== -->
+<section id="faq">
+<h2><span class="num">19</span> Frequently Asked Questions</h2>
+
+<div class="card"><h3>When is a deal created?</h3><p>When a Discovery meeting is booked. Not before. The deal represents an active sales opportunity, not a contact we're prospecting.</p></div>
+
+<div class="card"><h3>Can one contact have multiple deals?</h3><p>Yes. If Visit Phoenix was Closed Lost last year but you reconnected at the Summit → same contact, new deal. Old deal stays as history.</p></div>
+
+<div class="card"><h3>What's the difference between Lifecycle and Pipeline?</h3><p><strong>Lifecycle</strong> = where the CONTACT is (Lead, MQL, SQL, Customer). <strong>Pipeline</strong> = where the DEAL is (Discovery, Demo, Proposal). They sync automatically but are NOT the same thing.</p></div>
+
+<div class="card"><h3>Where does the SDR track their work?</h3><p>In <strong>Lead Status</strong> (contact property): New → Enriching → Outreach → Meeting Booked. NOT in the deal pipeline. SDR work is pre-deal.</p></div>
+
+<div class="card"><h3>Who should do outreach — SDR or AE?</h3><p><strong>SDR</strong> for cold contacts (event tarjetas, Apollo, outbound). <strong>AE</strong> keeps warm contacts where they had a real conversation. Rule: if there's a personal relationship → AE maintains it.</p></div>
+
+<div class="card"><h3>Why no SQL stage in the pipeline?</h3><p>SQL is a <strong>lifecycle stage</strong>, not a deal stage. Per Gap Selling, BANT should emerge from Discovery, not be a pre-meeting checklist. SQL = "meeting booked" (lifecycle) not a pipeline stage deals sit in.</p></div>
+
+<div class="card"><h3>What about "Circle Back"?</h3><p>Use <strong>Closed Lost</strong> with reason "Not now — timing" + a reactivation date. A workflow auto-creates a task when the date arrives. Max 2 reactivations. This prevents zombie deals.</p></div>
+
+<div class="card"><h3>What if the AE discovers there's no real problem in Discovery?</h3><p>→ Closed Lost (reason: "No problem identified"). This is normal and healthy. It means the pipeline only has real opportunities.</p></div>
+
+<div class="card"><h3>How do we track what generates pipeline?</h3><p>Every deal has a <strong>B2B Source</strong> property (Outbound, Inbound, Referral, Trade Show). This tells you which sources generate the most Discovery meetings and wins.</p></div>
+
+<div class="card"><h3>Discovery and Demo on the same call?</h3><p><strong>No.</strong> They are two meetings with different objectives. Discovery = understand the problem. Demo = present the solution. Doing both at once leads to generic demos that don't address the real pain. Gap between them: 3-4 days.</p></div>
+</section>
+
+<footer style="text-align:center;padding:40px;color:var(--gray);font-size:.85em;border-top:1px solid #e9ecef;margin-top:40px">
+  🚀 Powered by Elena · WTW Growth Intelligence · v3 FINAL · March 2026<br>
+  <small>Sources: 1,491 deal analysis · Board Meeting Q1 2026 · Sojern 2026 · 30X Sales Foundations · Gap Selling (Keenan)</small>
+</footer>
+
+</div></div>
+
+<script>
+const links=document.querySelectorAll('.sidebar a');
+const sections=document.querySelectorAll('section[id]');
+window.addEventListener('scroll',()=>{let c='';sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)c=s.id});links.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+c)})});
+
+new Chart(document.getElementById('funnelChart'),{type:'bar',data:{
+  labels:['Discovery','Demo','Proposal','Negotiation','Closing Soon','Won'],
+  datasets:[{label:'Target Deals (Monthly)',data:[20,14,8,5,4,3],backgroundColor:'rgba(255,107,53,0.7)',borderRadius:6}]
+},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},title:{display:true,text:'Monthly Pipeline Funnel (Target)',font:{size:14}}},scales:{x:{grid:{display:false}}}}});
+
+new Chart(document.getElementById('conversionChart'),{type:'line',data:{
+  labels:['Discovery→Demo','Demo→Proposal','Proposal→Negot.','Negot.→Closing','Closing→Won'],
+  datasets:[{label:'Target %',data:[70,60,50,60,85],borderColor:'#FF6B35',backgroundColor:'rgba(255,107,53,0.1)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#FF6B35'}]
+},options:{responsive:true,plugins:{title:{display:true,text:'Stage Conversion Rates (Target)',font:{size:14}}},scales:{y:{beginAtZero:true,max:100,title:{display:true,text:'%'}}}}});
+</script>
+</body>
+</html>
