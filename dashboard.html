@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WTW B2B Dashboard — Elena</title>
+<style>
+  :root {
+    --bg: #0f1117; --card: #1a1d27; --border: #2a2d3a;
+    --text: #e4e4e7; --muted: #71717a; --accent: #6366f1;
+    --green: #22c55e; --yellow: #eab308; --red: #ef4444; --blue: #3b82f6;
+    --orange: #f97316; --purple: #a855f7; --cyan: #06b6d4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+  
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .header h1 { font-size: 24px; font-weight: 600; }
+  .header h1 span { color: var(--accent); }
+  .header .meta { color: var(--muted); font-size: 13px; }
+  .refresh-btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  .refresh-btn:hover { opacity: 0.9; }
+  .refresh-btn:disabled { opacity: 0.5; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .card .value { font-size: 32px; font-weight: 700; }
+  .card .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  
+  .pipeline-bar { display: flex; gap: 2px; height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+  .pipeline-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; min-width: 30px; cursor: pointer; transition: opacity 0.2s; }
+  .pipeline-bar .segment:hover { opacity: 0.8; }
+  
+  .pipeline-table { width: 100%; border-collapse: collapse; }
+  .pipeline-table th { text-align: left; padding: 10px 12px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+  .pipeline-table td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .pipeline-table tr:hover { background: rgba(99,102,241,0.05); }
+  .pipeline-table .count { font-weight: 700; font-size: 18px; }
+  .pipeline-table .pct { color: var(--muted); font-size: 12px; }
+  
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-lead { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .badge-sql { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .badge-opp { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .badge-customer { background: rgba(34,197,94,0.15); color: var(--green); }
+  
+  .chart-container { display: flex; gap: 24px; flex-wrap: wrap; }
+  .donut-wrap { text-align: center; }
+  .donut-wrap h4 { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  
+  .bar-chart { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 300px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 160px; font-size: 13px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 24px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: white; min-width: fit-content; }
+  .bar-count { width: 40px; font-size: 13px; font-weight: 600; text-align: right; }
+  
+  .loading { text-align: center; padding: 60px; color: var(--muted); }
+  .loading .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  .error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 16px; border-radius: 8px; color: var(--red); }
+  
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; background: transparent; color: var(--muted); border: 1px solid transparent; }
+  .tab.active { background: var(--card); color: var(--text); border-color: var(--border); }
+  .tab:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🚀 <span>Accessibility Verified</span> — B2B Dashboard</h1>
+    <div class="meta">Pipeline: New Clients | Data: Live from HubSpot</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="meta" id="lastUpdate">Loading...</span>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div id="content">
+  <div class="loading"><div class="spinner"></div><br>Connecting to HubSpot...</div>
+</div>
+
+<script>
+let TOKEN = localStorage.getItem('hs_token') || '';
+const PIPELINE_ID = '75e28846-ad0d-4be2-a027-5e1da6590b98';
+
+function promptToken() {
+  const saved = localStorage.getItem('hs_token');
+  if (saved) { TOKEN = saved; return true; }
+  const t = prompt('Enter HubSpot API Token (pat-na1-...)');
+  if (t && t.startsWith('pat-')) { TOKEN = t; localStorage.setItem('hs_token', t); return true; }
+  document.getElementById('content').innerHTML = '<div class="error">❌ API Token required. Refresh and enter your HubSpot Private App token.</div>';
+  return false;
+}
+
+const STAGE_ORDER = [
+  { id: '156438446', label: 'SQL (old)', color: '#64748b', lifecycle: 'lead' },
+  { id: '156438447', label: 'SQL (new)', color: '#94a3b8', lifecycle: 'lead' },
+  { id: 'checkout_abandoned', label: 'Opportunity', color: '#a78bfa', lifecycle: 'lead' },
+  { id: '1315313531', label: 'Discovery', color: '#6366f1', lifecycle: 'sql' },
+  { id: 'checkout_pending', label: 'Demo', color: '#3b82f6', lifecycle: 'opportunity' },
+  { id: '1315313532', label: 'Proposal Sent', color: '#0ea5e9', lifecycle: 'opportunity' },
+  { id: '156438448', label: 'Negotiation', color: '#f97316', lifecycle: 'opportunity' },
+  { id: '156438449', label: 'Closing Soon', color: '#eab308', lifecycle: 'opportunity' },
+  { id: 'checkout_completed', label: 'Won', color: '#22c55e', lifecycle: 'customer', closed: true },
+  { id: '157690240', label: 'Executed', color: '#10b981', lifecycle: 'customer', closed: true },
+  { id: '179107353', label: 'Circle Back', color: '#71717a', lifecycle: 'lead' },
+  { id: 'processed', label: 'Lost', color: '#ef4444', lifecycle: 'lead', closed: true },
+];
+
+const LIFECYCLE_COLORS = {
+  lead: '#3b82f6', marketingqualifiedlead: '#8b5cf6', salesqualifiedlead: '#a855f7',
+  opportunity: '#f97316', customer: '#22c55e', subscriber: '#64748b', other: '#71717a',
+  '44210751': '#06b6d4', '44199292': '#ec4899'
+};
+const LIFECYCLE_LABELS = {
+  lead: 'Lead', marketingqualifiedlead: 'MQL', salesqualifiedlead: 'SQL',
+  opportunity: 'Opportunity', customer: 'Customer', subscriber: 'Subscriber',
+  other: 'Other', '44210751': 'Experience Booked', '44199292': 'Evangelist'
+};
+
+async function hsGet(url) {
+  const resp = await fetch(url, { headers: { 'Authorization': `Bearer ${TOKEN}` } });
+  if (!resp.ok) throw new Error(`API ${resp.status}`);
+  return resp.json();
+}
+
+async function hsPost(url, body) {
+  const resp = await fetch(url, {
+    method: 'POST', headers: { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) throw new Error(`API ${resp.status}`);
+  return resp.json();
+}
+
+async function countByStage() {
+  const results = {};
+  for (const stage of STAGE_ORDER) {
+    const data = await hsPost('https://api.hubapi.com/crm/v3/objects/deals/search', {
+      filterGroups: [{ filters: [
+        { propertyName: 'pipeline', operator: 'EQ', value: PIPELINE_ID },
+        { propertyName: 'dealstage', operator: 'EQ', value: stage.id }
+      ]}], limit: 0
+    });
+    results[stage.id] = data.total || 0;
+  }
+  return results;
+}
+
+async function getLifecycleDistribution(objectType) {
+  const counts = {};
+  const data = await hsPost(`https://api.hubapi.com/crm/v3/objects/${objectType}/search`, {
+    filterGroups: [{ filters: [
+      { propertyName: 'lifecyclestage', operator: 'HAS_PROPERTY' }
+    ]}], properties: ['lifecyclestage'], limit: 0
+  });
+  
+  // Need to get by each lifecycle value
+  const stages = Object.keys(LIFECYCLE_LABELS);
+  for (const lc of stages) {
+    try {
+      const d = await hsPost(`https://api.hubapi.com/crm/v3/objects/${objectType}/search`, {
+        filterGroups: [{ filters: [
+          { propertyName: 'lifecyclestage', operator: 'EQ', value: lc }
+        ]}], limit: 0
+      });
+      if (d.total > 0) counts[lc] = d.total;
+    } catch(e) {}
+  }
+  return counts;
+}
+
+async function getOrgTypeDistribution() {
+  const types = ['DMO / Tourism Board', 'Government / Public Sector', 'Hotel / Hospitality Group',
+    'Attraction / Experience operator', 'Marketing / Advertising Agency', 'Travel agency / OTA',
+    'Consulting Firm', 'Media / Press', 'Other'];
+  const counts = {};
+  for (const t of types) {
+    try {
+      const d = await hsPost('https://api.hubapi.com/crm/v3/objects/companies/search', {
+        filterGroups: [{ filters: [
+          { propertyName: 'organization_type', operator: 'EQ', value: t }
+        ]}], limit: 0
+      });
+      if (d.total > 0) counts[t] = d.total;
+    } catch(e) {}
+  }
+  // Count empty
+  try {
+    const all = await hsPost('https://api.hubapi.com/crm/v3/objects/companies/search', {
+      filterGroups: [{ filters: [
+        { propertyName: 'hs_object_id', operator: 'HAS_PROPERTY' }
+      ]}], limit: 0
+    });
+    const filled = Object.values(counts).reduce((a,b) => a+b, 0);
+    const empty = (all.total || 0) - filled;
+    if (empty > 0) counts['(Empty)'] = empty;
+  } catch(e) {}
+  return counts;
+}
+
+async function getContactTypeDistribution() {
+  const types = ['B2B Lead (AV)', 'Contact Lead', 'Customer', 'Tourism Office', 'Travel Agency',
+    'Tour Operator', 'Places to Stay', 'Mapper', 'Follower', 'Referrer'];
+  const counts = {};
+  for (const t of types) {
+    try {
+      const d = await hsPost('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+        filterGroups: [{ filters: [
+          { propertyName: 'type_of_customer', operator: 'EQ', value: t }
+        ]}], limit: 0
+      });
+      if (d.total > 0) counts[t] = d.total;
+    } catch(e) {}
+  }
+  return counts;
+}
+
+function renderPipelineBar(stageCounts) {
+  const total = Object.values(stageCounts).reduce((a,b) => a+b, 0);
+  if (!total) return '';
+  return `<div class="pipeline-bar">${STAGE_ORDER.map(s => {
+    const count = stageCounts[s.id] || 0;
+    if (!count) return '';
+    const pct = (count / total * 100);
+    return `<div class="segment" style="background:${s.color};width:${Math.max(pct, 2)}%" title="${s.label}: ${count}">${pct > 4 ? count : ''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderPipelineTable(stageCounts) {
+  const total = Object.values(stageCounts).reduce((a,b) => a+b, 0);
+  const activeStages = STAGE_ORDER.filter(s => !s.closed);
+  const closedStages = STAGE_ORDER.filter(s => s.closed);
+  const activeTotal = activeStages.reduce((a,s) => a + (stageCounts[s.id]||0), 0);
+  
+  return `<table class="pipeline-table">
+    <thead><tr><th>Stage</th><th>Lifecycle</th><th style="text-align:right">Deals</th><th style="text-align:right">%</th></tr></thead>
+    <tbody>
+    ${STAGE_ORDER.map(s => {
+      const count = stageCounts[s.id] || 0;
+      const pct = total ? (count/total*100).toFixed(1) : 0;
+      const lcBadge = s.lifecycle === 'lead' ? 'badge-lead' : s.lifecycle === 'sql' ? 'badge-sql' : s.lifecycle === 'opportunity' ? 'badge-opp' : 'badge-customer';
+      const lcLabel = s.lifecycle === 'sql' ? 'SQL' : s.lifecycle.charAt(0).toUpperCase() + s.lifecycle.slice(1);
+      return `<tr>
+        <td><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${s.color};margin-right:8px"></span>${s.label}</td>
+        <td><span class="badge ${lcBadge}">${lcLabel}</span></td>
+        <td style="text-align:right" class="count">${count}</td>
+        <td style="text-align:right" class="pct">${pct}%</td>
+      </tr>`;
+    }).join('')}
+    <tr style="font-weight:700;border-top:2px solid var(--border)">
+      <td>Total</td><td></td>
+      <td style="text-align:right" class="count">${total}</td>
+      <td style="text-align:right" class="pct">100%</td>
+    </tr>
+    </tbody></table>`;
+}
+
+function renderBarChart(data, colorMap, maxBars = 12) {
+  const sorted = Object.entries(data).sort((a,b) => b[1] - a[1]).slice(0, maxBars);
+  const max = sorted[0]?.[1] || 1;
+  const colors = ['#6366f1','#3b82f6','#22c55e','#f97316','#eab308','#a855f7','#ec4899','#06b6d4','#64748b','#ef4444','#10b981','#8b5cf6'];
+  
+  return `<div class="bar-chart">${sorted.map(([label, count], i) => {
+    const pct = (count / max * 100);
+    const color = colorMap?.[label] || colors[i % colors.length];
+    return `<div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,3)}%;background:${color}">${count}</div></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+async function loadAll() {
+  const btn = document.querySelector('.refresh-btn');
+  btn.disabled = true; btn.textContent = '⏳ Loading...';
+  
+  try {
+    document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div><br>Fetching live data from HubSpot...</div>';
+    
+    const [stageCounts, companyLC, contactLC, orgTypes, contactTypes] = await Promise.all([
+      countByStage(),
+      getLifecycleDistribution('companies'),
+      getLifecycleDistribution('contacts'),
+      getOrgTypeDistribution(),
+      getContactTypeDistribution()
+    ]);
+    
+    const totalDeals = Object.values(stageCounts).reduce((a,b) => a+b, 0);
+    const activeDeals = STAGE_ORDER.filter(s => !s.closed).reduce((a,s) => a + (stageCounts[s.id]||0), 0);
+    const wonDeals = (stageCounts['checkout_completed']||0) + (stageCounts['157690240']||0);
+    const discoveryPlus = (stageCounts['1315313531']||0) + (stageCounts['checkout_pending']||0) + 
+      (stageCounts['1315313532']||0) + (stageCounts['156438448']||0) + (stageCounts['156438449']||0);
+    
+    const totalCompanies = Object.values(companyLC).reduce((a,b) => a+b, 0);
+    const totalContacts = Object.values(contactLC).reduce((a,b) => a+b, 0);
+    const b2bContacts = contactTypes['B2B Lead (AV)'] || 0;
+    
+    document.getElementById('content').innerHTML = `
+      <!-- KPI Cards -->
+      <div class="grid">
+        <div class="card">
+          <h3>Total Deals</h3>
+          <div class="value">${totalDeals.toLocaleString()}</div>
+          <div class="sub">${activeDeals} active · ${wonDeals} won/executed</div>
+        </div>
+        <div class="card">
+          <h3>Active Pipeline</h3>
+          <div class="value" style="color:var(--accent)">${discoveryPlus}</div>
+          <div class="sub">Discovery → Closing Soon</div>
+        </div>
+        <div class="card">
+          <h3>B2B Contacts</h3>
+          <div class="value" style="color:var(--blue)">${b2bContacts.toLocaleString()}</div>
+          <div class="sub">Type: B2B Lead (AV)</div>
+        </div>
+        <div class="card">
+          <h3>Companies Tracked</h3>
+          <div class="value" style="color:var(--green)">${totalCompanies.toLocaleString()}</div>
+          <div class="sub">${Object.values(orgTypes).reduce((a,b)=>a+b,0) - (orgTypes['(Empty)']||0)} with org type</div>
+        </div>
+      </div>
+      
+      <!-- Pipeline -->
+      <div class="section">
+        <h2>📊 Deal Pipeline — Accessibility Verified New Clients</h2>
+        ${renderPipelineBar(stageCounts)}
+        <div class="card" style="margin-top:12px;overflow-x:auto">
+          ${renderPipelineTable(stageCounts)}
+        </div>
+      </div>
+      
+      <!-- Lifecycle + Org Type -->
+      <div class="grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="section">
+          <h2>🏢 Company Lifecycle Stage</h2>
+          <div class="card">${renderBarChart(companyLC, LIFECYCLE_COLORS)}</div>
+        </div>
+        <div class="section">
+          <h2>👤 Contact Lifecycle Stage</h2>
+          <div class="card">${renderBarChart(contactLC, LIFECYCLE_COLORS)}</div>
+        </div>
+      </div>
+      
+      <div class="grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="section">
+          <h2>🏷️ Organization Type (Companies)</h2>
+          <div class="card">${renderBarChart(orgTypes)}</div>
+        </div>
+        <div class="section">
+          <h2>👥 Contact Type Distribution</h2>
+          <div class="card">${renderBarChart(contactTypes)}</div>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('lastUpdate').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    document.getElementById('content').innerHTML = `<div class="error">❌ Error loading data: ${e.message}<br><br>Check API token and try again.</div>`;
+  }
+  
+  btn.disabled = false; btn.textContent = '↻ Refresh';
+}
+
+// Load on start
+if (promptToken()) loadAll();
+
+// Add logout button
+document.querySelector('.header .meta').insertAdjacentHTML('beforeend', 
+  ' | <a href="#" style="color:var(--muted);font-size:12px" onclick="localStorage.removeItem(\'hs_token\');location.reload()">🔑 Change token</a>');
+</script>
+</body>
+</html>
